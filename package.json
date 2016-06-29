@@ -4,7 +4,7 @@
   "description": "An interactive data visualization tool",
   "main": "src/scripts/vizwit.js",
   "scripts": {
-    "start": "npm run watch & npm run server",
+    "start": "npm run server | npm run watch",
     "build": "gulp build",
     "watch": "gulp watch",
     "server": "static ./dist",

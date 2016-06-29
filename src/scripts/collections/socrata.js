@@ -40,6 +40,21 @@ module.exports = BaseProvider.extend({
         // Order by (only if there will be multiple results)
         query.order(this.config.order || 'value desc')
       }
+	
+	  //  Get Sample Size
+	  if (this.config.sample_size) {
+		  query.select(this.config.sample_size + ' as sample_size')
+	  }
+	
+	  // Get Confidence Interval
+	  if (this.config.confidence_low) {
+		  query.select(this.config.confidence_low + ' as ci_low')
+	  }
+	  if (this.config.confidence_high) {
+		  query.select(this.config.confidence_high + ' as ci_high')
+	  }
+	
+	
     } else {
       // Offset
       if (this.config.offset) query.offset(this.config.offset)

@@ -49,15 +49,21 @@ module.exports = Card.extend({
     this.renderFilters()
   },
   render: function () {
-    this.map = L.map(this.$('.card-content').get(0)) // .setView([39.95, -75.1667], 13)
+    this.map = L.map(this.$('.card-content').get(0)).setView([37.8, -96], 3)
 
     // Disable scroll zoom
     this.map.scrollWheelZoom.disable()
 
-    L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
-      attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
-      maxZoom: 16
-    }).addTo(this.map)
+    //L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+      //attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+      //maxZoom: 16
+    //}).addTo(this.map)
+	var mapboxAccessToken = 'pk.eyJ1IjoibmJ1dHRvbjIyIiwiYSI6ImNpcHlnbWYyazB5YTJoMm5ybzFoZG10bzEifQ.tWhxB6348UuDm-OeO3kV4w';
+
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=' + mapboxAccessToken, {
+      id: 'mapbox.light'
+	}).addTo(this.map);
+	
   },
   addBoundaries: function () {
     if (this.boundaries.length && this.collection.length) {

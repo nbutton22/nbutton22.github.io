@@ -11,9 +11,16 @@ module.exports = BaseChart.extend({
         title: 'Data',
         valueField: 'value',
         fillAlphas: 0.6,
+		bullet: "yError",
+		bulletAxis: "yAxis",
+		bulletSize: 10,
+		errorField: "error",
         clustered: false,
         lineColor: '#97bbcd',
-        balloonText: '<b>[[category]]</b><br>Total: [[value]]'
+		bulletColor: '#000000',
+		bulletBorderThickness: 1,
+		bulletAlpha: 0.6,
+        balloonText: '<b>Overall<br>[[value]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
       },
       {
         type: 'column',
@@ -32,6 +39,7 @@ module.exports = BaseChart.extend({
     chart: {
       type: 'serial',
       theme: 'light',
+	  columnWidth: 0.5,
       responsive: {
         enabled: true,
         rules: [
@@ -54,32 +62,37 @@ module.exports = BaseChart.extend({
       },
       addClassNames: true,
       categoryField: 'label',
-      marginLeft: 0,
+      marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
       valueAxes: [{
+		id: "yAxis",
+		autoGridCount: false,
+		gridCount: 20,
         labelFunction: numberFormatter,
-        position: 'right',
-        inside: true,
+        position: 'left',
+		minimum: 0,
         axisThickness: 0,
         axisAlpha: 0,
         tickLength: 0,
+		title: "Percent (%)",
         includeAllValues: true,
         ignoreAxisWidth: true,
-        gridAlpha: 0
+        gridAlpha: 0.2
       }],
       chartCursor: {
         fullWidth: true,
-        cursorAlpha: 0.1,
+        cursorAlpha: 0.2,
         zoomable: false,
         oneBalloonOnly: true,
+		graphBulletSize: 1,
         categoryBalloonEnabled: false
       },
       maxSelectedSeries: 10,
       // startDuration: 0.5,
       // startEffect: 'easeOutSine',
       zoomOutText: '',
-      creditsPosition: 'top-right',
+      creditsPosition: 'bottom-right',
       categoryAxis: {
         autoWrap: true,
         gridAlpha: 0,

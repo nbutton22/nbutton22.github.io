@@ -36,5 +36,10 @@ if (params.gist) {
   })
 // If no config specified, redirect to homepage
 } else {
-  window.location.replace('http://vizwit.io')
+  $.getJSON(pathToFiles + 'test.json', function (data) {
+    layout(data, layoutOptions)
+  }).fail(function () {
+    console.error('Error loading file', 'test.json')
+  })
+  //window.location.replace('http://vizwit.io')
 }

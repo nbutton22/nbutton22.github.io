@@ -65,13 +65,16 @@ module.exports = Card.extend({
     var self = this
     var chartData = []
     var records = limit ? new Backbone.Collection(this.collection.slice(0, limit)) : this.collection
-
     // Map collection(s) into format expected by chart library
     records.forEach(function (model) {
       var label = model.get('label')
       var data = {
         label: label,
-        value: model.get('value')
+        value: model.get('value'),
+		sample_size: model.get('sample_size'),
+		ci_low: model.get('ci_low'),
+		ci_high: model.get('ci_high'),
+		error: model.get('ci_high') - model.get('ci_low')
       }
       // If the filtered collection has been fetched, find the corresponding record and put it in another series
       if (self.filteredCollection.length) {

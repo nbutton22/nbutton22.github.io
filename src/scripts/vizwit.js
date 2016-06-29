@@ -28,6 +28,7 @@ exports.init = function (container, config, opts) {
     config: config,
     fieldsCache: opts.fieldsCache
   })
+  console.log(collection)
   var filteredCollection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
