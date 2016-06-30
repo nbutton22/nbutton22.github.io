@@ -11,6 +11,7 @@ var DateTime = require('./views/datetime')
 var Choropleth = require('./views/choropleth')
 var Pie = require('./views/pie')
 var Callout = require('./views/callout')
+var Map = require('./views/map')
 
 exports.init = function (container, config, opts) {
   // If globals weren't passed, create them within this scope
@@ -28,7 +29,7 @@ exports.init = function (container, config, opts) {
     config: config,
     fieldsCache: opts.fieldsCache
   })
-  console.log(collection)
+
   var filteredCollection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
@@ -45,6 +46,15 @@ exports.init = function (container, config, opts) {
         vent: opts.vent
       })
       break
+	case 'map':
+	  new Map({
+		  config: config,
+		  el: container,
+		  collection: collection,
+		  filteredCollection: filteredCollection,
+		  vent: opts.vent
+	  })
+	  break
     case 'datetime':
       new DateTime({
         config: config,

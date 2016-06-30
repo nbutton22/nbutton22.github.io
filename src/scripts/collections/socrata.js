@@ -54,7 +54,10 @@ module.exports = BaseProvider.extend({
 		  query.select(this.config.confidence_high + ' as ci_high')
 	  }
 	
-	
+	  // Get footnote information
+		  //query.select(this.config.footnote + ' as footnote_symbol')
+	      //query.select('data_value_footnote as footnote')
+	  
     } else {
       // Offset
       if (this.config.offset) query.offset(this.config.offset)

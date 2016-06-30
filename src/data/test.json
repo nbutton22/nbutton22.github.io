@@ -1,0 +1,108 @@
+{
+  "version": "2",
+  "header": {
+    "title": "Georgia Alcohol Consumption Data 2014",
+    "description": "Responses from several Behavioral Risk Factor Surveillance System (BRFSS) questions pertaining to alcohol consumption collected from Georgia"
+  },
+  "cards": [
+    {
+      "x": 0,
+      "y": 0,
+      "width": 6,
+      "height": 8,
+      "vizwit": {
+        "chartType": "bar",
+        "title": "Alcoholic Consumption",
+        "description": "Adults asked if they have had at least one drink of alcohol within the last 30 days",
+        "provider": "socrata",
+        "domain": "chronicdata.cdc.gov",
+        "dataset": "fn2i-3j6c",
+        "groupBy": "response",
+        "valueField": "sum(data_value)",
+        "order": "label desc",
+		"sample_size": "sum(sample_size)",
+		"confidence_low": "sum(confidence_limit_low)",
+		"confidence_high": "sum(confidence_limit_high)",
+		"footnote": "data_value_footnote_symbol",
+        "baseFilters": [
+          {
+            "field": "topic",
+            "expression": {
+              "type": "=",
+              "value": "Alcohol Consumption"
+            }
+          },
+          {
+            "field": "locationdesc",
+            "expression": {
+              "type": "=",
+              "value": "Georgia"
+            }
+          },
+          {
+            "field": "break_out",
+            "expression": {
+              "type": "=",
+              "value": "Overall"
+            }
+          },
+          {
+            "field": "year",
+            "expression": {
+              "type": "=",
+              "value": "2014"
+            }
+          }
+        ]
+      }
+    },
+	{
+      "x": 0,
+      "y": 20,
+      "width": 12,
+      "height": 8,
+      "vizwit": {
+        "chartType": "map",
+        "title": "National Alcoholic Consumption",
+        "description": "Adults asked if they have had at least one drink in the last 30 days--graph shows percent that responded 'Yes'",
+        "provider": "socrata",
+        "domain": "chronicdata.cdc.gov",
+        "dataset": "fn2i-3j6c",
+        "groupBy": "locationdesc",
+        "valueField": "sum(data_value)",
+        "order": "label",
+		"sample_size": "sum(sample_size)",
+        "baseFilters": [
+          {
+            "field": "topic",
+            "expression": {
+              "type": "=",
+              "value": "Alcohol Consumption"
+            }
+          },
+		  {
+			"field": "response",
+			"expression": {
+			  "type": "=",
+			  "value": "Yes"
+			}
+		  },
+          {
+            "field": "break_out",
+            "expression": {
+              "type": "=",
+              "value": "Overall"
+            }
+          },
+          {
+            "field": "year",
+            "expression": {
+              "type": "=",
+              "value": "2014"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

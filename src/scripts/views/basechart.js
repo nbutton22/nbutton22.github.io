@@ -41,10 +41,15 @@ module.exports = Card.extend({
   render: function () {
     // Initialize chart
     var config = $.extend(true, {}, this.settings.chart)
-    config.dataProvider = this.formatChartData(this.settings.limit)
+	if (this.settings.chart.type == "map") {
+	  config.dataProvider = this.formatMapData(this.settings.limit)
+	} else {
+      config.dataProvider = this.formatChartData(this.settings.limit)
+	}
 
+	console.log(config)
     // Define the series/graph for the original amount
-    config.graphs = [$.extend(true, {}, this.settings.graphs[0])]
+    if (this.settings.graphs) { config.graphs = [$.extend(true, {}, this.settings.graphs[0])] }
 
     // If there's a filtered amount, define the series/graph for it
     if (this.filteredCollection.getFilters().length) {
@@ -55,10 +60,12 @@ module.exports = Card.extend({
       config.graphs.push($.extend(true, {}, this.settings.graphs[1]))
     }
 
-    this.updateGuide(config)
+    if (this.settings.categoryAxis) { this.updateGuide(config) }
+
 
     // Initialize the chart
     this.chart = AmCharts.makeChart(null, config)
+
     this.chart.write(this.$('.card-content').get(0))
   },
   formatChartData: function (limit) {
@@ -87,6 +94,48 @@ module.exports = Card.extend({
     })
     return chartData
   },
+  //Make collection for map chart
+  formatMapData: function (limit) {
+    var self = this
+    var chartData = []
+	var stateIDs = [
+		"US-AL", "US-AK", "US-AZ", "US-AR", "US-CA", "US-CO", "US-CT", "US-DE", "US-FL", "US-GA",
+		"US-HI", "US-ID", "US-IL", "US-IN", "US-IA", "US-KS", "US-KY", "US-LA", "US-ME", "US-MD",
+		"US-MA", "US-MI", "US-MN", "US-MS", "US-MO", "US-MT", "US-NE", "US-NV", "US-NH", "US-NJ",
+		"US-NM", "US-NY", "US-NC", "US-ND", "US-OH", "US-OK", "US-OR", "US-PA", "US-RI", "US-SC",
+		"US-SD", "US-TN", "US-TX", "US-UT", "US-VT", "US-VA", "US-WA", "US-WV", "US-WI", "US-WY"
+	]
+    var records = limit ? new Backbone.Collection(this.collection.slice(0, limit)) : this.collection
+    // Map collection(s) into format expected by chart library
+	var i = 0
+	var j = 0
+    records.forEach(function (model) {
+	  if (i != 2 && i != 3 && i != 10 && i != 13 && i != 42) {
+		var label = model.get('label')
+		var data = {
+			label: label,
+			id: stateIDs[j],
+			value: model.get('value'),
+			description: "<b>" + model.get('value') + "%</b><br>n: " + model.get('sample_size')
+		}
+		// If the filtered collection has been fetched, find the corresponding record and put it in another series
+		if (self.filteredCollection.length) {
+			var match = self.filteredCollection.get(label)
+			// Push a record even if there's no match so we don't align w/ the wrong bar in the other collection
+			data.filteredValue = match ? match.get('value') : 0
+		}
+
+		chartData.push(data)
+		j++
+	  }
+	  i++
+    })
+	var dataProv = {
+		map: 'usaLow',
+		areas: chartData
+	}
+    return dataProv
+  },  
   // Show guide on selected item or remove it if nothing's selected
   updateGuide: function (config) {
     var guide = config.categoryAxis.guides[0]
@@ -103,7 +152,7 @@ module.exports = Card.extend({
       if (guide.toDate) delete guide.toDate
       if (guide.category) delete guide.category
     }
-  },
+  },  
   // When a chart has been filtered
   onFilter: function (data) {
     // Add the filter to the filtered collection and fetch it with the filter

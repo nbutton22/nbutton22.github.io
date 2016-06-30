@@ -53,7 +53,7 @@ module.exports = function (config, options) {
     column.css('min-height', config.height * heightInterval)
 
     // Increment current.x to new starting position
-    current.x += config.width - 1
+    current.x += config.width
 
     // Add the div to the current row
     row.append(column)

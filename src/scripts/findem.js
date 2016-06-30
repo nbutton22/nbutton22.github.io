@@ -63498,7 +63498,10 @@ module.exports = BaseProvider.extend({
 		  query.select(this.config.confidence_high + ' as ci_high')
 	  }
 	
-	
+	  // Get footnote information
+		  //query.select(this.config.footnote + ' as footnote_symbol')
+	      //query.select('data_value_footnote as footnote')
+	  
     } else {
       // Offset
       if (this.config.offset) query.offset(this.config.offset)
@@ -63638,7 +63641,7 @@ module.exports = function (config, options) {
     column.css('min-height', config.height * heightInterval)
 
     // Increment current.x to new starting position
-    current.x += config.width - 1
+    current.x += config.width
 
     // Add the div to the current row
     row.append(column)
@@ -63651,7 +63654,7 @@ module.exports = function (config, options) {
   })
 }
 
-},{"./views/header":131,"./vizwit":135,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
+},{"./views/header":131,"./vizwit":136,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
 module.exports = function(data){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 __p+='';
@@ -63914,11 +63917,20 @@ module.exports = BaseChart.extend({
           }
         ]
       },
+	  //allLabels: [
+		//{
+			//x: 50,
+			//y: 415,
+			//text: 'test'
+	//	}
+	  //],
       addClassNames: true,
       categoryField: 'label',
+	  //autoMargins: false,
       marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
+	  marginBottom: 75,
       valueAxes: [{
 		id: "yAxis",
 		autoGridCount: false,
@@ -64103,10 +64115,15 @@ module.exports = Card.extend({
   render: function () {
     // Initialize chart
     var config = $.extend(true, {}, this.settings.chart)
-    config.dataProvider = this.formatChartData(this.settings.limit)
+	if (this.settings.chart.type == "map") {
+	  config.dataProvider = this.formatMapData(this.settings.limit)
+	} else {
+      config.dataProvider = this.formatChartData(this.settings.limit)
+	}
 
+	console.log(config)
     // Define the series/graph for the original amount
-    config.graphs = [$.extend(true, {}, this.settings.graphs[0])]
+    if (this.settings.graphs) { config.graphs = [$.extend(true, {}, this.settings.graphs[0])] }
 
     // If there's a filtered amount, define the series/graph for it
     if (this.filteredCollection.getFilters().length) {
@@ -64117,10 +64134,20 @@ module.exports = Card.extend({
       config.graphs.push($.extend(true, {}, this.settings.graphs[1]))
     }
 
-    this.updateGuide(config)
+    if (this.settings.categoryAxis) { this.updateGuide(config) }
+
 
     // Initialize the chart
     this.chart = AmCharts.makeChart(null, config)
+	//listener to deselect states
+	if (this.settings.chart.type == 'map') {
+		this.chart.addListener( 'clickMapObject', function( event ) {
+
+			// bring it to an appropriate color
+			this.chart.returnInitialColor( event.mapObject );
+
+		} );
+	}
     this.chart.write(this.$('.card-content').get(0))
   },
   formatChartData: function (limit) {
@@ -64149,6 +64176,48 @@ module.exports = Card.extend({
     })
     return chartData
   },
+  //Make collection for map chart
+  formatMapData: function (limit) {
+    var self = this
+    var chartData = []
+	var stateIDs = [
+		"US-AL", "US-AK", "US-AZ", "US-AR", "US-CA", "US-CO", "US-CT", "US-DE", "US-FL", "US-GA",
+		"US-HI", "US-ID", "US-IL", "US-IN", "US-IA", "US-KS", "US-KY", "US-LA", "US-ME", "US-MD",
+		"US-MA", "US-MI", "US-MN", "US-MS", "US-MO", "US-MT", "US-NE", "US-NV", "US-NH", "US-NJ",
+		"US-NM", "US-NY", "US-NC", "US-ND", "US-OH", "US-OK", "US-OR", "US-PA", "US-RI", "US-SC",
+		"US-SD", "US-TN", "US-TX", "US-UT", "US-VT", "US-VA", "US-WA", "US-WV", "US-WI", "US-WY"
+	]
+    var records = limit ? new Backbone.Collection(this.collection.slice(0, limit)) : this.collection
+    // Map collection(s) into format expected by chart library
+	var i = 0
+	var j = 0
+    records.forEach(function (model) {
+	  if (i != 2 && i != 3 && i != 10 && i != 13 && i != 42) {
+		var label = model.get('label')
+		var data = {
+			label: label,
+			id: stateIDs[j],
+			value: model.get('value'),
+			description: "<b>" + model.get('value') + "%</b><br>n: " + model.get('sample_size')
+		}
+		// If the filtered collection has been fetched, find the corresponding record and put it in another series
+		if (self.filteredCollection.length) {
+			var match = self.filteredCollection.get(label)
+			// Push a record even if there's no match so we don't align w/ the wrong bar in the other collection
+			data.filteredValue = match ? match.get('value') : 0
+		}
+
+		chartData.push(data)
+		j++
+	  }
+	  i++
+    })
+	var dataProv = {
+		map: 'usaLow',
+		areas: chartData
+	}
+    return dataProv
+  },  
   // Show guide on selected item or remove it if nothing's selected
   updateGuide: function (config) {
     var guide = config.categoryAxis.guides[0]
@@ -64165,7 +64234,7 @@ module.exports = Card.extend({
       if (guide.toDate) delete guide.toDate
       if (guide.category) delete guide.category
     }
-  },
+  },  
   // When a chart has been filtered
   onFilter: function (data) {
     // Add the filter to the filtered collection and fetch it with the filter
@@ -64749,6 +64818,134 @@ module.exports = Backbone.View.extend({
 },{"../templates/header.html":119,"backbone":12}],132:[function(require,module,exports){
 var $ = require('jquery')
 var _ = require('underscore')
+var BaseChart = require('./basechart')
+var numberFormatter = require('../util/number-formatter')
+
+module.exports = BaseChart.extend({
+  settings: {
+    chart: {
+		type: "map",
+		theme: "none",
+
+		colorSteps: 100,
+		zoomOnDoubleClick: false,
+		dragMap: false,
+
+		areasSettings: {
+			autoZoom: false,
+			balloonText: "<b>[[title]]</b><br>[[description]]",
+			color: "#A9C7D6",
+			colorSolid: "#538EAC",
+			rollOverOutlineColor: "#000000",
+			selectedColor: "#ddd64b",
+			descriptionWindowTop: 200,
+			descriptionWindowRight: -50,
+			descriptionWindowWidth: 0
+		},
+
+		valueLegend: {
+			right: 10,
+			minValue: "Low",
+			maxValue: "High",
+			showAsGradient: true
+		},
+
+	}
+}
+  /*initialize: function (options) {
+    BaseChart.prototype.initialize.apply(this, arguments)
+
+    _.bindAll(this, 'onClickCursor', 'onClickBar', 'onClickLabel', 'onHover', 'onClickScroll', 'zoomToBeginning')
+  },
+  events: {
+    'click .scroll a': 'onClickScroll'
+  },
+  render: function () {
+    BaseChart.prototype.render.apply(this, arguments)
+
+    // If there are greater than 10 bars, zoom to the first bar (ideally this would be done by configuration)
+    this.chart.addListener('drawn', this.zoomToBeginning)
+    this.zoomToBeginning() // since rendered isn't called the first time
+
+    // Listen to cursor hover changes
+    this.chart.chartCursor.addListener('changed', this.onHover)
+
+    // Listen to label clicks
+    this.chart.categoryAxis.addListener('clickItem', this.onClickLabel)
+
+    // If chart cursor is enabled (on larger screens) listen to clicks on it
+    if (this.chart.chartCursor.enabled) {
+      this.delegateEvents(_.extend({'click .card-content': 'onClickCursor'}, this.events))
+    // Otherwise listen to clicks on the bars
+    } else {
+      this.chart.addListener('clickGraphItem', this.onClickBar)
+    }
+
+    // If there are more records than the default, show scroll bars
+    if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {
+      this.$('.scroll').removeClass('hidden')
+    }
+  },
+  zoomToBeginning: function () {
+    if (this.collection.length > this.chart.maxSelectedSeries) {
+      this.chart.zoomToIndexes(0, this.chart.maxSelectedSeries)
+    }
+  },
+  onClickScroll: function (e) {
+    var modification = $(e.currentTarget).data('dir') === 'decrease' ? -1 : 1
+    var displayCount = this.chart.maxSelectedSeries
+    var start = Math.min(this.collection.length - 1 - displayCount, Math.max(0, this.chart.startIndex + modification))
+    var end = Math.max(displayCount, Math.min(this.collection.length - 1, this.chart.endIndex + modification))
+
+    if (start !== this.chart.startIndex || end !== this.chart.endIndex) {
+      this.chart.zoomToIndexes(start, end)
+    }
+    e.preventDefault()
+  },
+  // Keep track of which column the cursor is hovered over
+  onHover: function (e) {
+    if (e.index == null) {
+      this.hovering = null
+    } else {
+      this.hovering = this.chart.categoryAxis.data[e.index]
+    }
+  },
+  // When the user clicks on a bar in this chart
+  onClickCursor: function (e) {
+    if (this.hovering !== null) {
+      this.onSelect(this.hovering.category)
+    }
+  },
+  onClickBar: function (e) {
+    this.onSelect(e.item.category)
+  },
+  onClickLabel: function (e) {
+    this.onSelect(e.serialDataItem.category)
+  },
+  onSelect: function (category) {
+    // If already selected, clear the filter
+    var filter = this.filteredCollection.getFilters(this.filteredCollection.getTriggerField())
+    if (filter && filter.expression.value === category) {
+      this.vent.trigger(this.collection.getDataset() + '.filter', {
+        field: this.filteredCollection.getTriggerField()
+      })
+    // Otherwise, add the filter
+    } else {
+      // Trigger the global event handler with this filter
+      this.vent.trigger(this.collection.getDataset() + '.filter', {
+        field: this.collection.getTriggerField(),
+        expression: {
+          type: '=',
+          value: category
+        }
+      })
+    }
+  } */
+})
+
+},{"../util/number-formatter":122,"./basechart":124,"jquery":29,"underscore":106}],133:[function(require,module,exports){
+var $ = require('jquery')
+var _ = require('underscore')
 var Card = require('./card')
 var LoaderOn = require('../util/loader').on
 var LoaderOff = require('../util/loader').off
@@ -64897,7 +65094,7 @@ module.exports = Card.extend({
   }
 })
 
-},{"../util/loader":121,"./card":126,"./config/pie.config":128,"amcharts3":6,"amcharts3/amcharts/pie":7,"amcharts3/amcharts/plugins/responsive/responsive":8,"amcharts3/amcharts/themes/light":10,"jquery":29,"underscore":106}],133:[function(require,module,exports){
+},{"../util/loader":121,"./card":126,"./config/pie.config":128,"amcharts3":6,"amcharts3/amcharts/pie":7,"amcharts3/amcharts/plugins/responsive/responsive":8,"amcharts3/amcharts/themes/light":10,"jquery":29,"underscore":106}],134:[function(require,module,exports){
 var _ = require('underscore')
 var Card = require('./card')
 var LoaderOn = require('../util/loader').on
@@ -65014,7 +65211,7 @@ module.exports = Card.extend({
   }
 })
 
-},{"../util/loader":121,"./card":126,"bootstrap/js/tooltip":16,"datatables":28,"datatables/media/js/dataTables.bootstrap":27,"underscore":106}],134:[function(require,module,exports){
+},{"../util/loader":121,"./card":126,"bootstrap/js/tooltip":16,"datatables":28,"datatables/media/js/dataTables.bootstrap":27,"underscore":106}],135:[function(require,module,exports){
 var $ = require('jquery')
 var deparam = require('node-jquery-deparam')
 var Gist = require('./collections/gist')
@@ -65061,7 +65258,7 @@ if (params.gist) {
   //window.location.replace('http://vizwit.io')
 }
 
-},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}],135:[function(require,module,exports){
+},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}],136:[function(require,module,exports){
 /*eslint no-new:0*/
 var _ = require('underscore')
 var Backbone = require('backbone')
@@ -65075,6 +65272,7 @@ var DateTime = require('./views/datetime')
 var Choropleth = require('./views/choropleth')
 var Pie = require('./views/pie')
 var Callout = require('./views/callout')
+var Map = require('./views/map')
 
 exports.init = function (container, config, opts) {
   // If globals weren't passed, create them within this scope
@@ -65092,7 +65290,7 @@ exports.init = function (container, config, opts) {
     config: config,
     fieldsCache: opts.fieldsCache
   })
-  console.log(collection)
+
   var filteredCollection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
@@ -65109,6 +65307,15 @@ exports.init = function (container, config, opts) {
         vent: opts.vent
       })
       break
+	case 'map':
+	  new Map({
+		  config: config,
+		  el: container,
+		  collection: collection,
+		  filteredCollection: filteredCollection,
+		  vent: opts.vent
+	  })
+	  break
     case 'datetime':
       new DateTime({
         config: config,
@@ -65159,4 +65366,4 @@ exports.init = function (container, config, opts) {
   }
 }
 
-},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/datetime":129,"./views/pie":132,"./views/table":133,"backbone":12,"underscore":106}]},{},[134]);
+},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/datetime":129,"./views/map":132,"./views/pie":133,"./views/table":134,"backbone":12,"underscore":106}]},{},[135]);

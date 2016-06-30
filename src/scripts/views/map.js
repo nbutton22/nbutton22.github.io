@@ -5,125 +5,37 @@ var numberFormatter = require('../util/number-formatter')
 
 module.exports = BaseChart.extend({
   settings: {
-    graphs: [
-      {
-        type: 'column',
-        title: 'Data',
-        valueField: 'value',
-        fillAlphas: 0.6,
-		bullet: "yError",
-		bulletAxis: "yAxis",
-		bulletSize: 10,
-		errorField: "error",
-        clustered: false,
-        lineColor: '#97bbcd',
-		bulletColor: '#000000',
-		bulletBorderThickness: 1,
-		bulletAlpha: 0.6,
-        balloonText: '<b>Overall<br>[[value]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
-      },
-      {
-        type: 'column',
-        title: 'Filtered Data',
-        valueField: 'filteredValue',
-        fillAlphas: 0.4,
-        clustered: false,
-        lineColor: '#97bbcd',
-        balloonFunction: function (item, graph) {
-          return '<b>' + item.category +
-            '</b><br>Total: ' + (+item.dataContext.value).toLocaleString() +
-            '<br>Filtered Amount: ' + (+item.dataContext.filteredValue).toLocaleString()
-        }
-      }
-    ],
     chart: {
-      type: 'serial',
-      theme: 'light',
-	  columnWidth: 0.5,
-      responsive: {
-        enabled: true,
-        rules: [
-          {
-            maxWidth: 600,
-            overrides: {
-              maxSelectedSeries: 5
-            }
-          },
-          {
-            maxWidth: 450,
-            overrides: {
-              maxSelectedSeries: 3,
-              chartCursor: {
-                enabled: false
-              }
-            }
-          }
-        ]
-      },
-	  //allLabels: [
-		//{
-			//x: 50,
-			//y: 415,
-			//text: 'test'
-	//	}
-	  //],
-      addClassNames: true,
-      categoryField: 'label',
-	  //autoMargins: false,
-      marginLeft: 50,
-      marginRight: 0,
-      marginTop: 0,
-	  marginBottom: 75,
-      valueAxes: [{
-		id: "yAxis",
-		autoGridCount: false,
-		gridCount: 20,
-        labelFunction: numberFormatter,
-        position: 'left',
-		minimum: 0,
-        axisThickness: 0,
-        axisAlpha: 0,
-        tickLength: 0,
-		title: "Percent (%)",
-        includeAllValues: true,
-        ignoreAxisWidth: true,
-        gridAlpha: 0.2
-      }],
-      chartCursor: {
-        fullWidth: true,
-        cursorAlpha: 0.2,
-        zoomable: false,
-        oneBalloonOnly: true,
-		graphBulletSize: 1,
-        categoryBalloonEnabled: false
-      },
-      maxSelectedSeries: 10,
-      // startDuration: 0.5,
-      // startEffect: 'easeOutSine',
-      zoomOutText: '',
-      creditsPosition: 'bottom-right',
-      categoryAxis: {
-        autoWrap: true,
-        gridAlpha: 0,
-        labelFunction: function (label) {
-          return label && label.length > 12 ? label.substr(0, 12) + '…' : label
-        },
-        guides: [{
-          lineThickness: 2,
-          lineColor: '#ddd64b',
-          fillColor: '#ddd64b',
-          fillAlpha: 0.4,
-          // label: 'Filtered',
-          // inside: true,
-          // color: '#000',
-          balloonText: 'Currently filtered',
-          expand: true,
-          above: true
-        }]
-      }
-    }
-  },
-  initialize: function (options) {
+		type: "map",
+		theme: "none",
+
+		colorSteps: 100,
+		zoomOnDoubleClick: false,
+		dragMap: false,
+
+		areasSettings: {
+			autoZoom: false,
+			balloonText: "<b>[[title]]</b><br>[[description]]",
+			color: "#A9C7D6",
+			colorSolid: "#538EAC",
+			rollOverOutlineColor: "#000000",
+			selectedColor: "#ddd64b",
+			descriptionWindowTop: 200,
+			descriptionWindowRight: -50,
+			descriptionWindowWidth: 0
+		},
+
+		valueLegend: {
+			right: 10,
+			minValue: "Low",
+			maxValue: "High",
+			showAsGradient: true
+		},
+		
+
+	}
+}
+  /*initialize: function (options) {
     BaseChart.prototype.initialize.apply(this, arguments)
 
     _.bindAll(this, 'onClickCursor', 'onClickBar', 'onClickLabel', 'onHover', 'onClickScroll', 'zoomToBeginning')
@@ -211,5 +123,5 @@ module.exports = BaseChart.extend({
         }
       })
     }
-  }
+  } */
 })
