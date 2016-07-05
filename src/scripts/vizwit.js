@@ -30,6 +30,10 @@ exports.init = function (container, config, opts) {
     fieldsCache: opts.fieldsCache
   })
 
+ /*  var noCollection = new Provider(null, {
+	  config: config,
+	  fieldsCache: opts.feildsCache
+  }) */
   var filteredCollection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
@@ -42,6 +46,7 @@ exports.init = function (container, config, opts) {
         config: config,
         el: container,
         collection: collection,
+		//noCollection: noCollection,
         filteredCollection: filteredCollection,
         vent: opts.vent
       })
@@ -60,6 +65,7 @@ exports.init = function (container, config, opts) {
         config: config,
         el: container,
         collection: collection,
+		//noCollection: noCollection,
         filteredCollection: filteredCollection,
         vent: opts.vent
       })

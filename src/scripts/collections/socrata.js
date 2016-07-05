@@ -22,7 +22,11 @@ module.exports = BaseProvider.extend({
     if (this.config.valueField || this.config.aggregateFunction || this.config.groupBy) {
       // If valueField specified, use it as the value
       if (this.config.valueField) {
-        query.select(this.config.valueField + ' as value')
+		  if (this.config.chartType == "datetime") {
+			  query.select(this.config.valueField + 'as yes')
+		  } else {
+			query.select(this.config.valueField + ' as value')
+		  }
       // Otherwise use the aggregateFunction / aggregateField as the value
       } else {
         // If group by was specified but no aggregate function, use count by default
@@ -53,10 +57,10 @@ module.exports = BaseProvider.extend({
 	  if (this.config.confidence_high) {
 		  query.select(this.config.confidence_high + ' as ci_high')
 	  }
-	
+	  
 	  // Get footnote information
-		  //query.select(this.config.footnote + ' as footnote_symbol')
-	      //query.select('data_value_footnote as footnote')
+		  query.select('min(data_value_footnote_symbol) as footnote_symbol')
+	      query.select('min(data_value_footnote) as footnote')
 	  
     } else {
       // Offset
@@ -80,6 +84,7 @@ module.exports = BaseProvider.extend({
 
     // Limit
     query.limit(this.config.limit || '5000')
+
 
     return query.getURL()
   },

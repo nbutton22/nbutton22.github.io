@@ -18,25 +18,53 @@ module.exports = Card.extend({
     // Save options to view
     this.vent = options.vent || null
     this.filteredCollection = options.filteredCollection || null
+	//this.noCollection = options.noCollection || null
 
     // Listen to vent filters
     this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
 
     // Listen to collection
     this.listenTo(this.collection, 'sync', this.render)
+	//this.listenTo(this.noCollection, 'sync', this.render)
     this.listenTo(this.filteredCollection, 'sync', this.render)
 
     // Loading indicators
     this.listenTo(this.collection, 'request', LoaderOn)
     this.listenTo(this.collection, 'sync', LoaderOff)
+	//this.listenTo(this.noCollection, 'request', LoaderOn)
+	//this.listenTo(this.noCollection, 'request', LoaderOff)
     this.listenTo(this.filteredCollection, 'request', LoaderOn)
     this.listenTo(this.filteredCollection, 'sync', LoaderOff)
 
     // Set collection order if specified (necessary for datetime chart)
     if (this.settings.collectionOrder) this.collection.setOrder(this.settings.collectionOrder)
-
+	
+	var yesData = {
+		field: 'response',
+		expression: {
+			type: '=',
+			value: 'Yes'
+		}
+	}
+	
+	var noData = {
+		field: 'response',
+		expression: {
+			type: '=',
+			value: 'No'
+		}
+	}
+	
     // Fetch collection
+	//this.collection.setFilter(yesData)
     this.collection.fetch()
+	
+	/* if (this.noCollection) {
+	this.noCollection.setFilter(noData)
+	this.noCollection.fetch()
+	console.log(this.noCollection)
+	} */
+
   },
   render: function () {
     // Initialize chart
@@ -47,26 +75,83 @@ module.exports = Card.extend({
       config.dataProvider = this.formatChartData(this.settings.limit)
 	}
 
-	console.log(config)
-    // Define the series/graph for the original amount
-    if (this.settings.graphs) { config.graphs = [$.extend(true, {}, this.settings.graphs[0])] }
 
+    // Define the series/graph for the original amount
+	if (this.settings.graphs){
+		if (this.settings.graphs.length == 2) { 
+			config.graphs = [$.extend(true, {}, this.settings.graphs[0])] 
+		} else {
+			config.graphs = this.settings.graphs.slice(0,2)
+		}
+	}
+
+	
     // If there's a filtered amount, define the series/graph for it
-    if (this.filteredCollection.getFilters().length) {
+     if (this.filteredCollection.getFilters().length) {
       // Change color of original graph to subdued
-      config.graphs[0].lineColor = '#ddd'
-      config.graphs[0].showBalloon = false
+      //config.graphs[0].lineColor = '#ddd'
+      //config.graphs[0].showBalloon = false
 
       config.graphs.push($.extend(true, {}, this.settings.graphs[1]))
-    }
+    } 
 
     if (this.settings.categoryAxis) { this.updateGuide(config) }
 
 
     // Initialize the chart
     this.chart = AmCharts.makeChart(null, config)
-
+	
+	this.addFootnote(config, this.chart)	
+	
     this.chart.write(this.$('.card-content').get(0))
+  },
+  addFootnote: function(config, chart) {
+		var note = ''
+		var width = this.$('.card-content').get(0).offsetWidth
+		var strPixels
+		if (Array.isArray(config.dataProvider)) {
+		config.dataProvider.forEach(function (data) {
+				if (data.footnote_symbol != '') {
+					note = data.footnote_symbol + data.footnote
+				}
+			})
+		}
+		var split = new Array()
+		var start
+
+		while (this.getTextWidth(note) > width) {
+			var ndx = this.getIndexForLength(note, width)
+			start = note.slice(0, ndx)
+			note = note.slice(ndx)
+			if (note.charAt(0) == ' ') { note = note.slice(1) }
+			split.push(start)
+		}
+		split.push(note)
+        var percent = 90
+		split.forEach(function (str) {
+			var strPercent = percent.toString() + '%'
+			chart.addLabel(10, strPercent, str, 'left', 11)
+			percent+=3
+		})  
+  },
+  getIndexForLength: function (str, pix) {
+	  var ndx = Math.floor(pix / 6) - 5
+	  var start = str.slice(0, ndx)
+	  while (this.getTextWidth(start) < pix) {
+		  start = str.slice(0, ++ndx)
+	  }
+	  ndx-= 3
+	  while (str.charAt(ndx) != ' ') {
+		  ndx--
+	  }
+	  return ndx
+  },
+  getTextWidth: function (str) {
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext("2d");
+	ctx.font = "11px Verdana";        
+	var width = ctx.measureText(str).width;
+	return width
   },
   formatChartData: function (limit) {
     var self = this
@@ -75,14 +160,31 @@ module.exports = Card.extend({
     // Map collection(s) into format expected by chart library
     records.forEach(function (model) {
       var label = model.get('label')
+	  if (model.get('footnote_symbol')) {
+		  symbol = model.get('footnote_symbol')
+		  note = model.get('footnote')
+	  } else {
+		  symbol = ''
+		  note = ''
+	  }
       var data = {
+		footnote_symbol: symbol,
+		footnote: note,
         label: label,
+		yes: model.get('yes'),
+		no: 100 - model.get('yes'),
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),
 		ci_high: model.get('ci_high'),
 		error: model.get('ci_high') - model.get('ci_low')
       }
+	  /* if (self.noCollection.length) {
+		  data.no = self.noCollection.get('yes')
+		  data.ci_low_no = self.noCollection.get('ci_low')
+		  data.ci_high_no = self.noCollection.get('ci_high')
+		  data.sample_size_no = self.noCollection.get('sample_size')
+	  } */
       // If the filtered collection has been fetched, find the corresponding record and put it in another series
       if (self.filteredCollection.length) {
         var match = self.filteredCollection.get(label)

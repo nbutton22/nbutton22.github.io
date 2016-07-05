@@ -14,14 +14,25 @@ module.exports = BaseChart.extend({
     collectionOrder: 'label',
     graphs: [
       {
-        title: 'Data',
-        valueField: 'value',
-        fillAlphas: 0.4,
-        lineThickness: 4,
+        title: 'Yes',
+        valueField: 'yes',
+		bullet: 'round',
+        fillAlphas: 0,
+        lineThickness: 3,
         clustered: false,
         lineColor: '#97bbcd',
-        balloonText: '<b>[[category]]</b><br>Total: [[value]]'
+        balloonText: '<b>[[category]]<br>Overall<br>Yes: [[yes]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
       },
+	  {
+		  title: 'No',
+		  valueField: 'no',
+		  bullet: 'square',
+		  fillAlphas: 0,
+		  lineThickness: 3,
+		  clustered: false,
+		  lineColor: '#b398cd',
+		  balloonText: '<b>[[category]]<br>Overall<br>No: [[no]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
+	  },
       {
         title: 'Filtered Data',
         valueField: 'filteredValue',
@@ -45,23 +56,29 @@ module.exports = BaseChart.extend({
       },
       addClassNames: true,
       categoryField: 'label',
-      marginLeft: 0,
+      marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
+	  legend: {
+		  enabled: true,
+		  position: 'right'
+	  },
       valueAxes: [{
         labelFunction: numberFormatter,
-        position: 'right',
-        inside: true,
+        position: 'left',
+		title: "Percent (%)",
         axisThickness: 0,
         axisAlpha: 0,
         tickLength: 0,
         minimum: 0,
-        gridAlpha: 0
+		autoGridCount: false,
+		gridCount: 20,
+        gridAlpha: 0.2
       }],
       categoryAxis: {
         autoWrap: true,
-        parseDates: true,
-        minPeriod: 'MM',
+        parseDates: false,
+        //minPeriod: 'YYYY',
         gridAlpha: 0,
         guides: [{
           lineThickness: 2,
@@ -76,13 +93,14 @@ module.exports = BaseChart.extend({
           above: true
         }]
       },
-      dataDateFormat: 'YYYY-MM-DDT00:00:00.000', // "2015-04-07T16:21:00.000"
-      creditsPosition: 'top-right',
+      //dataDateFormat: 'YYYY-MM-DDT00:00:00.000', // "2015-04-07T16:21:00.000"
+      creditsPosition: 'bottom-right',
       chartCursor: {
-        categoryBalloonDateFormat: 'MMM YYYY',
+        categoryBalloonDateFormat: 'YYYY',
         cursorPosition: 'mouse',
         selectWithoutZooming: true,
         oneBalloonOnly: true,
+		graphBulletSize: 1,
         categoryBalloonEnabled: false
       }
     }

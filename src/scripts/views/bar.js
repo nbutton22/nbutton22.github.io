@@ -60,16 +60,9 @@ module.exports = BaseChart.extend({
           }
         ]
       },
-	  //allLabels: [
-		//{
-			//x: 50,
-			//y: 415,
-			//text: 'test'
-	//	}
-	  //],
       addClassNames: true,
       categoryField: 'label',
-	  //autoMargins: false,
+	  autoMargins: false,
       marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
