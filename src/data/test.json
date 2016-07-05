@@ -128,13 +128,6 @@
               "value": "Alcohol Consumption"
             }
           },
-		  {
-			"field": "response",
-			"expression": {
-			  "type": "=",
-			  "value": "Yes"
-			}
-		  },
           {
             "field": "locationdesc",
             "expression": {

@@ -15,25 +15,25 @@ module.exports = BaseChart.extend({
     graphs: [
       {
         title: 'Yes',
-        valueField: 'yes',
+        valueField: 'value',
 		bullet: 'round',
         fillAlphas: 0,
         lineThickness: 3,
         clustered: false,
         lineColor: '#97bbcd',
-        balloonText: '<b>[[category]]<br>Overall<br>Yes: [[yes]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
+        balloonText: '<b>[[category]]<br>Overall<br>Yes: [[value]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
       },
 	  {
 		  title: 'No',
-		  valueField: 'no',
+		  valueField: 'noValue',
 		  bullet: 'square',
 		  fillAlphas: 0,
 		  lineThickness: 3,
 		  clustered: false,
 		  lineColor: '#b398cd',
-		  balloonText: '<b>[[category]]<br>Overall<br>No: [[no]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
-	  },
-      {
+		  balloonText: '<b>[[category]]<br>Overall<br>No: [[noValue]]%</b><br>CI([[ci_low_no]] - [[ci_high_no]]), n = [[sample_size_no]]'
+	  }
+/*       {
         title: 'Filtered Data',
         valueField: 'filteredValue',
         fillAlphas: 0.4,
@@ -46,7 +46,7 @@ module.exports = BaseChart.extend({
 						'Total: ' + (+item.dataContext.value).toLocaleString() + '<br>' +
 						'Filtered Amount: ' + (+item.dataContext.filteredValue).toLocaleString()
         }
-      }
+      } */
     ],
     chart: {
       type: 'serial',

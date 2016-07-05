@@ -18,21 +18,21 @@ module.exports = Card.extend({
     // Save options to view
     this.vent = options.vent || null
     this.filteredCollection = options.filteredCollection || null
-	//this.noCollection = options.noCollection || null
+	this.noCollection = options.noCollection || null
 
     // Listen to vent filters
     this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
 
     // Listen to collection
     this.listenTo(this.collection, 'sync', this.render)
-	//this.listenTo(this.noCollection, 'sync', this.render)
+	this.listenTo(this.noCollection, 'sync', this.render)
     this.listenTo(this.filteredCollection, 'sync', this.render)
 
     // Loading indicators
     this.listenTo(this.collection, 'request', LoaderOn)
     this.listenTo(this.collection, 'sync', LoaderOff)
-	//this.listenTo(this.noCollection, 'request', LoaderOn)
-	//this.listenTo(this.noCollection, 'request', LoaderOff)
+	this.listenTo(this.noCollection, 'request', LoaderOn)
+	this.listenTo(this.noCollection, 'request', LoaderOff)
     this.listenTo(this.filteredCollection, 'request', LoaderOn)
     this.listenTo(this.filteredCollection, 'sync', LoaderOff)
 
@@ -56,14 +56,15 @@ module.exports = Card.extend({
 	}
 	
     // Fetch collection
-	//this.collection.setFilter(yesData)
+	if (this.settings.chart.legend) {
+		this.collection.setFilter(yesData)
+	}
     this.collection.fetch()
 	
-	/* if (this.noCollection) {
+	if (this.noCollection) {
 	this.noCollection.setFilter(noData)
 	this.noCollection.fetch()
-	console.log(this.noCollection)
-	} */
+	} 
 
   },
   render: function () {
@@ -75,7 +76,7 @@ module.exports = Card.extend({
       config.dataProvider = this.formatChartData(this.settings.limit)
 	}
 
-
+	console.log(config.dataProvider)
     // Define the series/graph for the original amount
 	if (this.settings.graphs){
 		if (this.settings.graphs.length == 2) { 
@@ -158,6 +159,7 @@ module.exports = Card.extend({
     var chartData = []
     var records = limit ? new Backbone.Collection(this.collection.slice(0, limit)) : this.collection
     // Map collection(s) into format expected by chart library
+	var ndx = 0
     records.forEach(function (model) {
       var label = model.get('label')
 	  if (model.get('footnote_symbol')) {
@@ -171,20 +173,20 @@ module.exports = Card.extend({
 		footnote_symbol: symbol,
 		footnote: note,
         label: label,
-		yes: model.get('yes'),
-		no: 100 - model.get('yes'),
+		no: 100 - model.get('value'),
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),
 		ci_high: model.get('ci_high'),
 		error: model.get('ci_high') - model.get('ci_low')
       }
-	  /* if (self.noCollection.length) {
-		  data.no = self.noCollection.get('yes')
-		  data.ci_low_no = self.noCollection.get('ci_low')
-		  data.ci_high_no = self.noCollection.get('ci_high')
-		  data.sample_size_no = self.noCollection.get('sample_size')
-	  } */
+	  if (self.noCollection) {
+
+		  data.noValue = self.noCollection.models[ndx].get('value')
+		  data.ci_low_no = self.noCollection.models[ndx].get('ci_low')
+		  data.ci_high_no = self.noCollection.models[ndx].get('ci_high')
+		  data.sample_size_no = self.noCollection.models[ndx].get('sample_size')
+	  } 
       // If the filtered collection has been fetched, find the corresponding record and put it in another series
       if (self.filteredCollection.length) {
         var match = self.filteredCollection.get(label)
@@ -193,6 +195,7 @@ module.exports = Card.extend({
       }
 
       chartData.push(data)
+	  ndx++
     })
     return chartData
   },

@@ -22,11 +22,10 @@ module.exports = BaseProvider.extend({
     if (this.config.valueField || this.config.aggregateFunction || this.config.groupBy) {
       // If valueField specified, use it as the value
       if (this.config.valueField) {
-		  if (this.config.chartType == "datetime") {
-			  query.select(this.config.valueField + 'as yes')
-		  } else {
-			query.select(this.config.valueField + ' as value')
-		  }
+
+
+		query.select(this.config.valueField + ' as value')
+
       // Otherwise use the aggregateFunction / aggregateField as the value
       } else {
         // If group by was specified but no aggregate function, use count by default
