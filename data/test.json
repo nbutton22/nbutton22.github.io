@@ -148,10 +148,10 @@
 	{
       "x": 0,
       "y": 40,
-      "width": 5,
+      "width": 6,
       "height": 8,
       "vizwit": {
-        "chartType": "bar",
+        "chartType": "clustered",
         "title": "Arthritis in Alaska",
         "description": "Adults who have been told that they have Arthritis grouped by age",
         "provider": "socrata",
@@ -178,13 +178,6 @@
               "value": "Alaska"
             }
           },
-		  {
-			"field": "response",
-			"expression": {
-			  "type": "=",
-			  "value": "Yes"
-			}
-		  },
           {
             "field": "break_out_category",
             "expression": {

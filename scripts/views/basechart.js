@@ -56,7 +56,8 @@ module.exports = Card.extend({
 	}
 	
     // Fetch collection
-	if (this.settings.chart.legend) {
+	if (options.config.chartType == 'datetime'
+			|| options.config.chartType == 'clustered') {
 		this.collection.setFilter(yesData)
 	}
     this.collection.fetch()
@@ -173,7 +174,6 @@ module.exports = Card.extend({
 		footnote_symbol: symbol,
 		footnote: note,
         label: label,
-		no: 100 - model.get('value'),
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),
@@ -186,6 +186,7 @@ module.exports = Card.extend({
 		  data.ci_low_no = self.noCollection.models[ndx].get('ci_low')
 		  data.ci_high_no = self.noCollection.models[ndx].get('ci_high')
 		  data.sample_size_no = self.noCollection.models[ndx].get('sample_size')
+		  data.error_no = self.noCollection.models[ndx].get('ci_high') - self.noCollection.models[ndx].get('ci_low')
 	  } 
       // If the filtered collection has been fetched, find the corresponding record and put it in another series
       if (self.filteredCollection.length) {

@@ -63658,7 +63658,7 @@ module.exports = function (config, options) {
   })
 }
 
-},{"./views/header":131,"./vizwit":136,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
+},{"./views/header":132,"./vizwit":137,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
 module.exports = function(data){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 __p+='';
@@ -64127,7 +64127,8 @@ module.exports = Card.extend({
 	}
 	
     // Fetch collection
-	if (this.settings.chart.legend) {
+	if (options.config.chartType == 'datetime'
+			|| options.config.chartType == 'clustered') {
 		this.collection.setFilter(yesData)
 	}
     this.collection.fetch()
@@ -64244,7 +64245,6 @@ module.exports = Card.extend({
 		footnote_symbol: symbol,
 		footnote: note,
         label: label,
-		no: 100 - model.get('value'),
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),
@@ -64257,6 +64257,7 @@ module.exports = Card.extend({
 		  data.ci_low_no = self.noCollection.models[ndx].get('ci_low')
 		  data.ci_high_no = self.noCollection.models[ndx].get('ci_high')
 		  data.sample_size_no = self.noCollection.models[ndx].get('sample_size')
+		  data.error_no = self.noCollection.models[ndx].get('ci_high') - self.noCollection.models[ndx].get('ci_low')
 	  } 
       // If the filtered collection has been fetched, find the corresponding record and put it in another series
       if (self.filteredCollection.length) {
@@ -64509,7 +64510,7 @@ module.exports = Backbone.View.extend({
   }
 })
 
-},{"../templates/card.html":116,"../templates/filters.html":118,"./embed-helper":130,"backbone":12,"bootstrap/js/dropdown":14,"bootstrap/js/modal":15,"jquery":29,"underscore":106}],127:[function(require,module,exports){
+},{"../templates/card.html":116,"../templates/filters.html":118,"./embed-helper":131,"backbone":12,"bootstrap/js/dropdown":14,"bootstrap/js/modal":15,"jquery":29,"underscore":106}],127:[function(require,module,exports){
 var _ = require('underscore')
 var L = require('leaflet')
 var Card = require('./card')
@@ -64695,6 +64696,221 @@ module.exports = Card.extend({
 })
 
 },{"../util/hash-table":120,"../util/loader":121,"./card":126,"leaflet":59,"leaflet-choropleth":58,"underscore":106}],128:[function(require,module,exports){
+var $ = require('jquery')
+var _ = require('underscore')
+var BaseChart = require('./basechart')
+var numberFormatter = require('../util/number-formatter')
+
+module.exports = BaseChart.extend({
+  settings: {
+    graphs: [
+      {
+        type: 'column',
+        title: 'Yes',
+        valueField: 'value',
+        fillAlphas: 0.6,
+		bullet: "yError",
+		bulletAxis: "yAxis",
+		bulletSize: 6,
+		errorField: "error",
+        lineColor: '#97bbcd',
+		bulletColor: '#000000',
+		bulletBorderThickness: 1,
+		bulletAlpha: 0.6,
+        balloonText: '<b>Yes<br>[[value]]%</b><br>CI([[ci_low]] - [[ci_high]]), n = [[sample_size]]'
+      },
+	  {
+        type: 'column',
+        title: 'No',
+        valueField: 'noValue',
+        fillAlphas: 0.6,
+		bullet: "yError",
+		bulletAxis: "yAxis",
+		bulletSize: 6,
+		errorField: "error_no",
+        lineColor: '#b398cd',
+		bulletColor: '#000000',
+		bulletBorderThickness: 1,
+		bulletAlpha: 0.6,
+        balloonText: '<b>No<br>[[noValue]]%</b><br>CI([[ci_low_no]] - [[ci_high_no]]), n = [[sample_size_no]]'
+      }
+    ],
+    chart: {
+      type: 'serial',
+      theme: 'light',
+	  columnWidth: 0.5,
+	  legend: {
+		  enabled: true,
+		  position: 'right'
+	  },
+      responsive: {
+        enabled: true,
+        rules: [
+          {
+            maxWidth: 600,
+            overrides: {
+              maxSelectedSeries: 5
+            }
+          },
+          {
+            maxWidth: 450,
+            overrides: {
+              maxSelectedSeries: 3,
+              chartCursor: {
+                enabled: false
+              }
+            }
+          }
+        ]
+      },
+      addClassNames: true,
+      categoryField: 'label',
+	  autoMargins: false,
+      marginLeft: 50,
+      marginRight: 0,
+      marginTop: 0,
+	  marginBottom: 75,
+      valueAxes: [{
+		id: "yAxis",
+		autoGridCount: false,
+		gridCount: 20,
+        labelFunction: numberFormatter,
+        position: 'left',
+		minimum: 0,
+        axisThickness: 0,
+        axisAlpha: 0,
+        tickLength: 0,
+		title: "Percent (%)",
+        includeAllValues: true,
+        ignoreAxisWidth: true,
+        gridAlpha: 0.2
+      }],
+      chartCursor: {
+        fullWidth: true,
+        cursorAlpha: 0.2,
+        zoomable: false,
+        oneBalloonOnly: true,
+		graphBulletSize: 1,
+        categoryBalloonEnabled: false
+      },
+      maxSelectedSeries: 10,
+      // startDuration: 0.5,
+      // startEffect: 'easeOutSine',
+      zoomOutText: '',
+      creditsPosition: 'bottom-right',
+      categoryAxis: {
+        autoWrap: true,
+        gridAlpha: 0,
+        labelFunction: function (label) {
+          return label && label.length > 12 ? label.substr(0, 12) + '…' : label
+        },
+        guides: [{
+          lineThickness: 2,
+          lineColor: '#ddd64b',
+          fillColor: '#ddd64b',
+          fillAlpha: 0.4,
+          // label: 'Filtered',
+          // inside: true,
+          // color: '#000',
+          balloonText: 'Currently filtered',
+          expand: true,
+          above: true
+        }]
+      }
+    }
+  },
+  initialize: function (options) {
+    BaseChart.prototype.initialize.apply(this, arguments)
+
+    _.bindAll(this, 'onClickCursor', 'onClickBar', 'onClickLabel', 'onHover', 'onClickScroll', 'zoomToBeginning')
+  },
+  events: {
+    'click .scroll a': 'onClickScroll'
+  },
+  render: function () {
+    BaseChart.prototype.render.apply(this, arguments)
+
+    // If there are greater than 10 bars, zoom to the first bar (ideally this would be done by configuration)
+    this.chart.addListener('drawn', this.zoomToBeginning)
+    this.zoomToBeginning() // since rendered isn't called the first time
+
+    // Listen to cursor hover changes
+    this.chart.chartCursor.addListener('changed', this.onHover)
+
+    // Listen to label clicks
+    this.chart.categoryAxis.addListener('clickItem', this.onClickLabel)
+
+    // If chart cursor is enabled (on larger screens) listen to clicks on it
+    if (this.chart.chartCursor.enabled) {
+      this.delegateEvents(_.extend({'click .card-content': 'onClickCursor'}, this.events))
+    // Otherwise listen to clicks on the bars
+    } else {
+      this.chart.addListener('clickGraphItem', this.onClickBar)
+    }
+
+    // If there are more records than the default, show scroll bars
+    if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {
+      this.$('.scroll').removeClass('hidden')
+    }
+  },
+  zoomToBeginning: function () {
+    if (this.collection.length > this.chart.maxSelectedSeries) {
+      this.chart.zoomToIndexes(0, this.chart.maxSelectedSeries)
+    }
+  },
+  onClickScroll: function (e) {
+    var modification = $(e.currentTarget).data('dir') === 'decrease' ? -1 : 1
+    var displayCount = this.chart.maxSelectedSeries
+    var start = Math.min(this.collection.length - 1 - displayCount, Math.max(0, this.chart.startIndex + modification))
+    var end = Math.max(displayCount, Math.min(this.collection.length - 1, this.chart.endIndex + modification))
+
+    if (start !== this.chart.startIndex || end !== this.chart.endIndex) {
+      this.chart.zoomToIndexes(start, end)
+    }
+    e.preventDefault()
+  },
+  // Keep track of which column the cursor is hovered over
+  onHover: function (e) {
+    if (e.index == null) {
+      this.hovering = null
+    } else {
+      this.hovering = this.chart.categoryAxis.data[e.index]
+    }
+  },
+  // When the user clicks on a bar in this chart
+  onClickCursor: function (e) {
+    if (this.hovering !== null) {
+      this.onSelect(this.hovering.category)
+    }
+  },
+  onClickBar: function (e) {
+    this.onSelect(e.item.category)
+  },
+  onClickLabel: function (e) {
+    this.onSelect(e.serialDataItem.category)
+  },
+  onSelect: function (category) {
+    // If already selected, clear the filter
+    var filter = this.filteredCollection.getFilters(this.filteredCollection.getTriggerField())
+    if (filter && filter.expression.value === category) {
+      this.vent.trigger(this.collection.getDataset() + '.filter', {
+        field: this.filteredCollection.getTriggerField()
+      })
+    // Otherwise, add the filter
+    } else {
+      // Trigger the global event handler with this filter
+      this.vent.trigger(this.collection.getDataset() + '.filter', {
+        field: this.collection.getTriggerField(),
+        expression: {
+          type: '=',
+          value: category
+        }
+      })
+    }
+  }
+})
+
+},{"../util/number-formatter":122,"./basechart":124,"jquery":29,"underscore":106}],129:[function(require,module,exports){
 module.exports = {
   type: 'pie',
   theme: 'light',
@@ -64745,7 +64961,7 @@ module.exports = {
   }
 }
 
-},{}],129:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 var _ = require('underscore')
 var BaseChart = require('./basechart')
 var numberFormatter = require('../util/number-formatter')
@@ -64899,7 +65115,7 @@ module.exports = BaseChart.extend({
   }
 })
 
-},{"../util/number-formatter":122,"./basechart":124,"amcharts3":6,"underscore":106}],130:[function(require,module,exports){
+},{"../util/number-formatter":122,"./basechart":124,"amcharts3":6,"underscore":106}],131:[function(require,module,exports){
 var Backbone = require('backbone')
 var Template = require('../templates/embed-helper.html')
 var Clipboard = require('clipboard')
@@ -64913,7 +65129,7 @@ module.exports = Backbone.Modal.extend({
   }
 })
 
-},{"../templates/embed-helper.html":117,"backbone":12,"backbone.modal/backbone.modal":11,"clipboard":19}],131:[function(require,module,exports){
+},{"../templates/embed-helper.html":117,"backbone":12,"backbone.modal/backbone.modal":11,"clipboard":19}],132:[function(require,module,exports){
 var Backbone = require('backbone')
 var Template = require('../templates/header.html')
 
@@ -64927,7 +65143,7 @@ module.exports = Backbone.View.extend({
   }
 })
 
-},{"../templates/header.html":119,"backbone":12}],132:[function(require,module,exports){
+},{"../templates/header.html":119,"backbone":12}],133:[function(require,module,exports){
 var $ = require('jquery')
 var _ = require('underscore')
 var BaseChart = require('./basechart')
@@ -64939,7 +65155,7 @@ module.exports = BaseChart.extend({
 		type: "map",
 		theme: "none",
 
-		colorSteps: 100,
+		colorSteps: 4,
 		zoomOnDoubleClick: false,
 		dragMap: false,
 
@@ -64959,7 +65175,6 @@ module.exports = BaseChart.extend({
 			right: 10,
 			minValue: "Low",
 			maxValue: "High",
-			showAsGradient: true
 		},
 		
 
@@ -65056,7 +65271,7 @@ module.exports = BaseChart.extend({
   } */
 })
 
-},{"../util/number-formatter":122,"./basechart":124,"jquery":29,"underscore":106}],133:[function(require,module,exports){
+},{"../util/number-formatter":122,"./basechart":124,"jquery":29,"underscore":106}],134:[function(require,module,exports){
 var $ = require('jquery')
 var _ = require('underscore')
 var Card = require('./card')
@@ -65207,7 +65422,7 @@ module.exports = Card.extend({
   }
 })
 
-},{"../util/loader":121,"./card":126,"./config/pie.config":128,"amcharts3":6,"amcharts3/amcharts/pie":7,"amcharts3/amcharts/plugins/responsive/responsive":8,"amcharts3/amcharts/themes/light":10,"jquery":29,"underscore":106}],134:[function(require,module,exports){
+},{"../util/loader":121,"./card":126,"./config/pie.config":129,"amcharts3":6,"amcharts3/amcharts/pie":7,"amcharts3/amcharts/plugins/responsive/responsive":8,"amcharts3/amcharts/themes/light":10,"jquery":29,"underscore":106}],135:[function(require,module,exports){
 var _ = require('underscore')
 var Card = require('./card')
 var LoaderOn = require('../util/loader').on
@@ -65324,7 +65539,7 @@ module.exports = Card.extend({
   }
 })
 
-},{"../util/loader":121,"./card":126,"bootstrap/js/tooltip":16,"datatables":28,"datatables/media/js/dataTables.bootstrap":27,"underscore":106}],135:[function(require,module,exports){
+},{"../util/loader":121,"./card":126,"bootstrap/js/tooltip":16,"datatables":28,"datatables/media/js/dataTables.bootstrap":27,"underscore":106}],136:[function(require,module,exports){
 var $ = require('jquery')
 var deparam = require('node-jquery-deparam')
 var Gist = require('./collections/gist')
@@ -65371,7 +65586,7 @@ if (params.gist) {
   //window.location.replace('http://vizwit.io')
 }
 
-},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}],136:[function(require,module,exports){
+},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}],137:[function(require,module,exports){
 /*eslint no-new:0*/
 var _ = require('underscore')
 var Backbone = require('backbone')
@@ -65386,6 +65601,7 @@ var Choropleth = require('./views/choropleth')
 var Pie = require('./views/pie')
 var Callout = require('./views/callout')
 var Map = require('./views/map')
+var Clustered = require('./views/clustered')
 
 exports.init = function (container, config, opts) {
   // If globals weren't passed, create them within this scope
@@ -65420,11 +65636,20 @@ exports.init = function (container, config, opts) {
         config: config,
         el: container,
         collection: collection,
-		//noCollection: noCollection,
         filteredCollection: filteredCollection,
         vent: opts.vent
       })
       break
+	case 'clustered':
+	  new Clustered({
+		config: config,
+		el: container,
+		collection: collection,
+		noCollection: noCollection,
+		filteredCollection: filteredCollection,
+		vent: opts.vent
+	  })
+	  break
 	case 'map':
 	  new Map({
 		  config: config,
@@ -65485,4 +65710,4 @@ exports.init = function (container, config, opts) {
   }
 }
 
-},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/datetime":129,"./views/map":132,"./views/pie":133,"./views/table":134,"backbone":12,"underscore":106}]},{},[135]);
+},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/clustered":128,"./views/datetime":130,"./views/map":133,"./views/pie":134,"./views/table":135,"backbone":12,"underscore":106}]},{},[136]);

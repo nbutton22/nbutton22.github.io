@@ -12,6 +12,7 @@ var Choropleth = require('./views/choropleth')
 var Pie = require('./views/pie')
 var Callout = require('./views/callout')
 var Map = require('./views/map')
+var Clustered = require('./views/clustered')
 
 exports.init = function (container, config, opts) {
   // If globals weren't passed, create them within this scope
@@ -46,11 +47,20 @@ exports.init = function (container, config, opts) {
         config: config,
         el: container,
         collection: collection,
-		//noCollection: noCollection,
         filteredCollection: filteredCollection,
         vent: opts.vent
       })
       break
+	case 'clustered':
+	  new Clustered({
+		config: config,
+		el: container,
+		collection: collection,
+		noCollection: noCollection,
+		filteredCollection: filteredCollection,
+		vent: opts.vent
+	  })
+	  break
 	case 'map':
 	  new Map({
 		  config: config,
