@@ -82,14 +82,14 @@ module.exports = BaseChart.extend({
         ignoreAxisWidth: true,
         gridAlpha: 0.2
       }],
-      chartCursor: {
+/*       chartCursor: {
         fullWidth: true,
         cursorAlpha: 0.2,
         zoomable: false,
         oneBalloonOnly: true,
 		graphBulletSize: 1,
         categoryBalloonEnabled: false
-      },
+      }, */
       maxSelectedSeries: 10,
       // startDuration: 0.5,
       // startEffect: 'easeOutSine',
@@ -132,18 +132,18 @@ module.exports = BaseChart.extend({
     this.zoomToBeginning() // since rendered isn't called the first time
 
     // Listen to cursor hover changes
-    this.chart.chartCursor.addListener('changed', this.onHover)
+   // this.chart.chartCursor.addListener('changed', this.onHover)
 
     // Listen to label clicks
     this.chart.categoryAxis.addListener('clickItem', this.onClickLabel)
 
     // If chart cursor is enabled (on larger screens) listen to clicks on it
-    if (this.chart.chartCursor.enabled) {
+/*     if (this.chart.chartCursor.enabled) {
       this.delegateEvents(_.extend({'click .card-content': 'onClickCursor'}, this.events))
     // Otherwise listen to clicks on the bars
     } else {
       this.chart.addListener('clickGraphItem', this.onClickBar)
-    }
+    } */
 
     // If there are more records than the default, show scroll bars
     if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {

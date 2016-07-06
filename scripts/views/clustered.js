@@ -87,14 +87,14 @@ module.exports = BaseChart.extend({
         ignoreAxisWidth: true,
         gridAlpha: 0.2
       }],
-      chartCursor: {
+/*       chartCursor: {
         fullWidth: true,
         cursorAlpha: 0.2,
         zoomable: false,
         oneBalloonOnly: true,
 		graphBulletSize: 1,
         categoryBalloonEnabled: false
-      },
+      }, */
       maxSelectedSeries: 10,
       // startDuration: 0.5,
       // startEffect: 'easeOutSine',
@@ -137,7 +137,7 @@ module.exports = BaseChart.extend({
     this.zoomToBeginning() // since rendered isn't called the first time
 
     // Listen to cursor hover changes
-    this.chart.chartCursor.addListener('changed', this.onHover)
+   // this.chart.chartCursor.addListener('changed', this.onHover)
 
     // Listen to label clicks
     this.chart.categoryAxis.addListener('clickItem', this.onClickLabel)
