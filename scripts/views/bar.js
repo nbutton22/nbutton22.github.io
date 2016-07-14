@@ -66,7 +66,7 @@ module.exports = BaseChart.extend({
       marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
-	  marginBottom: 75,
+	  marginBottom: 40,
       valueAxes: [{
 		id: "yAxis",
 		autoGridCount: false,

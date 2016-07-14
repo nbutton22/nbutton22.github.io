@@ -104,12 +104,12 @@ module.exports = Card.extend({
     this.chart = AmCharts.makeChart(null, config)
 	
 	this.addFootnote(config, this.chart)	
-	
+
     this.chart.write(this.$('.card-content').get(0))
   },
   addFootnote: function(config, chart) {
 		var note = ''
-		var width = this.$('.card-content').get(0).offsetWidth
+		var width = this.$('.card-content').get(0).offsetWidth * 0.8
 		var strPixels
 		if (Array.isArray(config.dataProvider)) {
 		config.dataProvider.forEach(function (data) {
@@ -173,7 +173,7 @@ module.exports = Card.extend({
       var data = {
 		footnote_symbol: symbol,
 		footnote: note,
-        label: label,
+        label: label + symbol,
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),

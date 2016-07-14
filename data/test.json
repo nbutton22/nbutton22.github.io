@@ -56,9 +56,9 @@
       }
     },
 	{
-      "x": 0,
-      "y": 20,
-      "width": 12,
+      "x": 6,
+      "y": 0,
+      "width": 6,
       "height": 8,
       "vizwit": {
         "chartType": "map",
@@ -106,48 +106,6 @@
 	{
       "x": 0,
       "y": 30,
-      "width": 8,
-      "height": 6,
-      "vizwit": {
-        "chartType": "datetime",
-        "title": "Alcoholic Consumption in Georgia 2011-2014",
-        "description": "Adults asked if they have had at least one drink of alcohol within the last 30 days",
-        "provider": "socrata",
-        "domain": "chronicdata.cdc.gov",
-        "dataset": "fn2i-3j6c",
-        "groupBy": "year",
-        "valueField": "sum(data_value)",
-		"sample_size": "sum(sample_size)",
-		"confidence_low": "sum(confidence_limit_low)",
-		"confidence_high": "sum(confidence_limit_high)",
-        "baseFilters": [
-          {
-            "field": "topic",
-            "expression": {
-              "type": "=",
-              "value": "Alcohol Consumption"
-            }
-          },
-          {
-            "field": "locationdesc",
-            "expression": {
-              "type": "=",
-              "value": "Georgia"
-            }
-          },
-          {
-            "field": "break_out",
-            "expression": {
-              "type": "=",
-              "value": "Overall"
-            }
-          }
-        ]
-      }
-    },
-	{
-      "x": 0,
-      "y": 40,
       "width": 6,
       "height": 8,
       "vizwit": {
@@ -190,6 +148,48 @@
             "expression": {
               "type": "=",
               "value": "2014"
+            }
+          }
+        ]
+      }
+    },
+	{
+      "x": 6,
+      "y": 30,
+      "width": 6,
+      "height": 8,
+      "vizwit": {
+        "chartType": "datetime",
+        "title": "Alcoholic Consumption in Georgia 2011-2014",
+        "description": "Adults asked if they have had at least one drink of alcohol within the last 30 days",
+        "provider": "socrata",
+        "domain": "chronicdata.cdc.gov",
+        "dataset": "fn2i-3j6c",
+        "groupBy": "year",
+        "valueField": "sum(data_value)",
+		"sample_size": "sum(sample_size)",
+		"confidence_low": "sum(confidence_limit_low)",
+		"confidence_high": "sum(confidence_limit_high)",
+        "baseFilters": [
+          {
+            "field": "topic",
+            "expression": {
+              "type": "=",
+              "value": "Alcohol Consumption"
+            }
+          },
+          {
+            "field": "locationdesc",
+            "expression": {
+              "type": "=",
+              "value": "Georgia"
+            }
+          },
+          {
+            "field": "break_out",
+            "expression": {
+              "type": "=",
+              "value": "Overall"
             }
           }
         ]

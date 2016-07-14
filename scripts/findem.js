@@ -63622,7 +63622,8 @@ module.exports = function (config, options) {
   var row
 
   container.empty()
-
+  container.attr("position", "relative")
+  var ndx = 1
   config.cards.forEach(function (config) {
     // If y suggests we're on a new row (including the first item), create a new row
     if (config.y !== current.y) {
@@ -63633,6 +63634,9 @@ module.exports = function (config, options) {
     }
 
     var column = $('<div/>')
+	column.attr("id", "box" + ndx)
+	column.attr("position", "absolute")
+	ndx++
 
     // Add width class
     column.addClass('col-sm-' + config.width)
@@ -63927,7 +63931,7 @@ module.exports = BaseChart.extend({
       marginLeft: 50,
       marginRight: 0,
       marginTop: 0,
-	  marginBottom: 75,
+	  marginBottom: 40,
       valueAxes: [{
 		id: "yAxis",
 		autoGridCount: false,
@@ -64175,12 +64179,12 @@ module.exports = Card.extend({
     this.chart = AmCharts.makeChart(null, config)
 	
 	this.addFootnote(config, this.chart)	
-	
+
     this.chart.write(this.$('.card-content').get(0))
   },
   addFootnote: function(config, chart) {
 		var note = ''
-		var width = this.$('.card-content').get(0).offsetWidth
+		var width = this.$('.card-content').get(0).offsetWidth * 0.8
 		var strPixels
 		if (Array.isArray(config.dataProvider)) {
 		config.dataProvider.forEach(function (data) {
@@ -64244,7 +64248,7 @@ module.exports = Card.extend({
       var data = {
 		footnote_symbol: symbol,
 		footnote: note,
-        label: label,
+        label: label + symbol,
         value: model.get('value'),
 		sample_size: model.get('sample_size'),
 		ci_low: model.get('ci_low'),
@@ -64741,7 +64745,11 @@ module.exports = BaseChart.extend({
 	  columnWidth: 0.5,
 	  legend: {
 		  enabled: true,
-		  position: 'right'
+		  autoMargins: false,
+		  position: 'right',
+		  marginRight: 0,
+		  labelWidth: 30,
+		  marginLeft: 20
 	  },
       responsive: {
         enabled: true,
@@ -64841,12 +64849,12 @@ module.exports = BaseChart.extend({
     this.chart.categoryAxis.addListener('clickItem', this.onClickLabel)
 
     // If chart cursor is enabled (on larger screens) listen to clicks on it
-    if (this.chart.chartCursor.enabled) {
+/*     if (this.chart.chartCursor.enabled) {
       this.delegateEvents(_.extend({'click .card-content': 'onClickCursor'}, this.events))
     // Otherwise listen to clicks on the bars
     } else {
       this.chart.addListener('clickGraphItem', this.onClickBar)
-    }
+    } */
 
     // If there are more records than the default, show scroll bars
     if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {

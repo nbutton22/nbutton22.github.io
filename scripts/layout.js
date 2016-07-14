@@ -30,7 +30,8 @@ module.exports = function (config, options) {
   var row
 
   container.empty()
-
+  container.attr("position", "relative")
+  var ndx = 1
   config.cards.forEach(function (config) {
     // If y suggests we're on a new row (including the first item), create a new row
     if (config.y !== current.y) {
@@ -41,6 +42,9 @@ module.exports = function (config, options) {
     }
 
     var column = $('<div/>')
+	column.attr("id", "box" + ndx)
+	column.attr("position", "absolute")
+	ndx++
 
     // Add width class
     column.addClass('col-sm-' + config.width)

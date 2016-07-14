@@ -45,6 +45,252 @@
 		<script src="https://www.amcharts.com/lib/3/maps/js/usaLow.js"></script>
 		<script src="https://www.amcharts.com/lib/3/themes/none.js"></script>
 		<script src="scripts/findem.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<!-- Script for animating boxes around -->
+	<!-- <script>
+		var box1 = false;
+		var box2 = false;
+		var box3 = false;
+		var box4 = false;
+		$(document).ready(function(){
+			//box1 animation
+			$("#box1").click(function(){
+				if (!box1) {
+					$("#box1").animate({
+						//left: '439px',
+						//top: '261px',
+						height: '653px',
+						width: '731px'
+					});
+					$("#box2").animate({
+						//left: '0px',
+						//top: '0px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box3").animate({
+						//left: '0px',
+						//top: '392px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box4").animate({
+						//left: '0px',
+						//top: '784px',
+						height: '392px',
+						width: '439px'
+					});
+					box1 = true;
+					box2 = false;
+					box3 = false;
+					box4 = false;
+				} else {
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					box1 = false;
+				}
+			});
+			//box2 animation
+			$("#box2").click(function(){
+				if (!box2) {
+					$("#box2").animate({
+						left: '439px',
+						top: '261px',
+						height: '653px',
+						width: '731px'
+					});
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '392px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '784px',
+						height: '392px',
+						width: '439px'
+					});
+					box2 = true;
+					box1 = false;
+					box3 = false;
+					box4 = false;
+				} else {
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					box2 = false;
+				}
+			});
+			//box3 animation
+			$("#box3").click(function(){
+				if (!box3) {
+					$("#box3").animate({
+						left: '439px',
+						top: '261px',
+						height: '653px',
+						width: '731px'
+					});
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '392px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '784px',
+						height: '392px',
+						width: '439px'
+					});
+					box3 = true;
+					box1 = false;
+					box2 = false;
+					box4 = false;
+				} else {
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					box3 = false;
+				}
+			});
+			//box4 animation
+			$("#box4").click(function(){
+				if (!box4) {
+					$("#box4").animate({
+						left: '439px',
+						top: '261px',
+						height: '653px',
+						width: '731px'
+					});
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '392px',
+						height: '392px',
+						width: '439px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '784px',
+						height: '392px',
+						width: '439px'
+					});
+					box4 = true;
+					box1 = false;
+					box2 = false;
+					box3 = false;
+				} else {
+					$("#box1").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box2").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box3").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					$("#box4").animate({
+						left: '0px',
+						top: '0px',
+						height: '522px',
+						width: '585px'
+					});
+					box4 = false;
+				}
+			});
+		});
+	</script> -->
 		<!-- <script src="scripts/vizwit-loader.js"></script> -->
 	</body>
 </html>
