@@ -76,8 +76,8 @@ module.exports = Card.extend({
 	} else {
       config.dataProvider = this.formatChartData(this.settings.limit)
 	}
-
 	console.log(config.dataProvider)
+
     // Define the series/graph for the original amount
 	if (this.settings.graphs){
 		if (this.settings.graphs.length == 2) { 
@@ -105,7 +105,14 @@ module.exports = Card.extend({
 	
 	this.addFootnote(config, this.chart)	
 
-    this.chart.write(this.$('.card-content').get(0))
+	var mycontainer = this.$('.card-content').get(0)
+	
+
+	if (this.config.chartType == "d3bar") {
+		makeBarChart(config.dataProvider, mycontainer, null)
+	} else {
+		this.chart.write(this.$('.card-content').get(0))
+	}
   },
   addFootnote: function(config, chart) {
 		var note = ''

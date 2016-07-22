@@ -6,6 +6,7 @@ var Providers = require('./config/providers')
 var GeoJSON = require('./collections/geojson')
 
 var Bar = require('./views/bar')
+var d3bar = require('./views/d3bar')
 var Table = require('./views/table')
 var DateTime = require('./views/datetime')
 var Choropleth = require('./views/choropleth')
@@ -44,6 +45,15 @@ exports.init = function (container, config, opts) {
   switch (config.chartType) {
     case 'bar':
       new Bar({
+        config: config,
+        el: container,
+        collection: collection,
+        filteredCollection: filteredCollection,
+        vent: opts.vent
+      })
+      break
+    case 'd3bar':
+      new d3bar({
         config: config,
         el: container,
         collection: collection,

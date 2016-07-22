@@ -47,7 +47,6 @@ module.exports = BaseChart.extend({
           }
         ]
       },
-
       addClassNames: true,
       categoryField: 'label',
 	  autoMargins: false,

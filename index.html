@@ -18,6 +18,82 @@
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/backbone.modal/1.1.5/backbone.modal.theme-min.css">
 		<link rel="stylesheet" href="styles/main.css">
 		
+		<style>
+		.y.axis path {
+			display: none;
+		}
+		
+		.grid path {
+			display: none;
+		}
+		
+		.grid .tick {
+			tick: lightgrey;
+			opacity: 0.2;
+		}
+		
+		.errbar {
+			color: #000;
+			opacity: 0.6;
+		}
+		
+		
+		.mytooltip {   
+			position: absolute;           
+			text-align: center;           
+			width: 160px;                                  
+			padding: 2px;                     
+			background: #FFF;   
+			border: 2px;
+			border-style: solid;
+			border-color: #97BBCD;
+			pointer-events: none;         
+		}
+		
+		
+		div.arrow-up {
+			position: absolute;
+			width: 0; 
+			height: 0; 
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+  
+			border-bottom: 5px solid #97BBCD;
+		}
+
+		div.arrow-down {
+			position: absolute;
+			width: 0; 
+			height: 0; 
+			border-left: 5px solid transparent;
+			border-right: 5px solid transparent;
+  
+			border-top: 5px solid #97BBCD;
+		}
+
+		div.arrow-right {
+			position: absolute;
+			width: 0; 
+			height: 0; 
+			border-top: 5px solid transparent;
+			border-bottom: 5px solid transparent;
+  
+			border-left: 5px solid #97BBCD;
+		}
+
+		div.arrow-left {
+			position: absolute;
+			width: 0; 
+			height: 0; 
+			border-top: 5px solid transparent;
+			border-bottom: 5px solid transparent; 
+  
+			border-right: 5px solid #97BBCD; 
+		}
+
+	</style>
+		
+		
 		<link rel="canonical" href="">
 		
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
@@ -44,6 +120,8 @@
 		<script src="https://www.amcharts.com/lib/3/ammap.js"></script>
 		<script src="https://www.amcharts.com/lib/3/maps/js/usaLow.js"></script>
 		<script src="https://www.amcharts.com/lib/3/themes/none.js"></script>
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="scripts/d3barChart.js"></script>
 		<script src="scripts/findem.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 		<!-- Script for animating boxes around -->
