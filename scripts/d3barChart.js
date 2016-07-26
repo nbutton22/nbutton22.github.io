@@ -11,7 +11,7 @@ function makeBarChart(dataProvider, container, config) {
 			right: 0
 		}
 		
-		console.log(config)
+
 		
 		
 		
@@ -22,6 +22,10 @@ function makeBarChart(dataProvider, container, config) {
 		divheight = Number(divheight.slice(0, divheight.length - 2))
 		var height = divheight - margin.top - margin.bottom;
 		var width = divwidth - margin.left - margin.right;
+		
+		var containerInfo = document.getElementById(config.cardId).getBoundingClientRect()
+		var containerTop = containerInfo.top
+		var containerLeft = containerInfo.left
 		
 		
 		
@@ -78,8 +82,12 @@ function makeBarChart(dataProvider, container, config) {
 			.attr('id', 'mytooltip')
 			.attr('class', 'mytooltip')
 			.style('opacity', 0)
+			.style('top', '0px')
+			.style('left', '0px')
 		var arrow = d3.select(container).append('div')
 			.style('opacity', 0)
+			.style('top', '0px')
+			.style('left', '0px')
 		var chart = svg.append('g')
 		chart.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 		chart.selectAll('rect').data(dataProvider)
@@ -105,6 +113,10 @@ function makeBarChart(dataProvider, container, config) {
 					myheight = myheight.slice(0, myheight.length - 2)
 					
 					var offsets = document.getElementById('rect' + i).getBoundingClientRect();
+					var offset = document.getElementById('rect' + i)
+					var offsetStyle = window.getComputedStyle(offset)
+					console.log(offsetStyle)
+					console.log('Top: ' + offsetStyle.getPropertyValue('top') + ', Left: ' + offsetStyle.getPropertyValue('left'))
 					var top = offsets.top + window.scrollY;
 					var left = offsets.left;
 					
@@ -121,22 +133,23 @@ function makeBarChart(dataProvider, container, config) {
 					arrow.transition()
 						.duration(100)
 						.style('opacity', 0.8)
-					arrow.style('left', (-4 - config.containerOffset + left + (mywidth / 2) - (mywidth - (xScale.bandwidth() * widthRatio)) / 2) + 'px')
+					arrow.style('left', (-4 - containerLeft + left + (mywidth / 2) - (mywidth - (xScale.bandwidth() * widthRatio)) / 2) + 'px')
 					div.transition()
 						.duration(100)
 						.style('opacity', 0.8)
 						
-					div.style('left', (-config.containerOffset + left - (mywidth - (xScale.bandwidth() * widthRatio)) / 2 + 'px'))
-						.style('top', (top + 5 + boxshift - config.headerOffset) + 'px')
-					arrow.style('top', (top + arrowshift - config.headerOffset) + 'px')
+					div.style('left', (left - containerLeft - (mywidth - (xScale.bandwidth() * widthRatio)) / 2 + 'px'))
+						.style('top', (top + 5 + boxshift - containerTop) + 'px')
+					arrow.style('top', (top + arrowshift - containerTop) + 'px')
+
 				})
 				.on('mouseout', function(d) {
 					div.transition()
 						.duration(100)
-						.style('opacity', 0);
+						.style('opacity', 0)
 					arrow.transition()
 						.duration(100)
-						.style('opacity', 0);
+						.style('opacity', 0)
 				})
 		chart.selectAll('path').data(dataProvider)
 			.enter().append('path')
