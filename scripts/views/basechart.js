@@ -108,8 +108,30 @@ module.exports = Card.extend({
 	var mycontainer = this.$('.card-content').get(0)
 	
 
+	var pageWidth = $(window).width()
+	
+	var header = $('.header-container').get(0)
+	var headerStyle = window.getComputedStyle(header)
+	var headerHeight = headerStyle.getPropertyValue('height')
+	headerHeight = Number(headerHeight.slice(0, headerHeight.length - 2))
+	var headerMargin = headerStyle.getPropertyValue('margin-bottom')
+	headerMargin = Number(headerMargin.slice(0, headerMargin.length - 2))
+	var headerPadding = headerStyle.getPropertyValue('padding-bottom')
+	headerPadding = Number(headerPadding.slice(0, headerPadding.length - 2))
+	
+	var container = $('.container').get(0)
+	var containerStyle = window.getComputedStyle(container)
+	var containerWidth = containerStyle.getPropertyValue('width')
+	containerWidth = Number(containerWidth.slice(0, containerWidth.length - 2))
+	
+	var myConfig = {
+		headerOffset: headerHeight + headerMargin,
+		containerOffset: (pageWidth - containerWidth) / 2
+	}
+	
+	
 	if (this.config.chartType == "d3bar") {
-		makeBarChart(config.dataProvider, mycontainer, null)
+		makeBarChart(config.dataProvider, mycontainer, myConfig)
 	} else {
 		this.chart.write(this.$('.card-content').get(0))
 	}

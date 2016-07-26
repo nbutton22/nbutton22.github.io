@@ -11,6 +11,8 @@ function makeBarChart(dataProvider, container, config) {
 			right: 0
 		}
 		
+		console.log(config)
+		
 		
 		
 		var style = window.getComputedStyle(container)
@@ -20,6 +22,7 @@ function makeBarChart(dataProvider, container, config) {
 		divheight = Number(divheight.slice(0, divheight.length - 2))
 		var height = divheight - margin.top - margin.bottom;
 		var width = divwidth - margin.left - margin.right;
+		
 		
 		
 		var yScale = d3.scaleLinear()
@@ -49,7 +52,8 @@ function makeBarChart(dataProvider, container, config) {
 		var barOffset = xScale.bandwidth() * widthRatio / 2
 		
 		var svg = d3.select(container).append('svg')
-		svg.attr('width', width + margin.left + margin.right)
+		//svg.attr('max-width', width + margin.left + margin.right)
+		svg.attr('width', '100%')
 		svg.attr('height', height + margin.top + margin.bottom)
 		svg.append('g')
 			.attr('class', 'y axis')
@@ -101,7 +105,7 @@ function makeBarChart(dataProvider, container, config) {
 					myheight = myheight.slice(0, myheight.length - 2)
 					
 					var offsets = document.getElementById('rect' + i).getBoundingClientRect();
-					var top = offsets.top;
+					var top = offsets.top + window.scrollY;
 					var left = offsets.left;
 					
 					if (yScale(d.value) + myheight < 0.9 * (height - margin.top - margin.bottom)) {
@@ -117,14 +121,14 @@ function makeBarChart(dataProvider, container, config) {
 					arrow.transition()
 						.duration(100)
 						.style('opacity', 0.8)
-					arrow.style('left', (-4 - 270.117 + left + (mywidth / 2) - (mywidth - (xScale.bandwidth() * widthRatio)) / 2) + 'px')
+					arrow.style('left', (-4 - config.containerOffset + left + (mywidth / 2) - (mywidth - (xScale.bandwidth() * widthRatio)) / 2) + 'px')
 					div.transition()
 						.duration(100)
 						.style('opacity', 0.8)
 						
-					div.style('left', (-4 -270.117 + left - (mywidth - (xScale.bandwidth() * widthRatio)) / 2 + 'px'))
-						.style('top', (top + 5 + boxshift) + 'px')
-					arrow.style('top', (top + arrowshift) + 'px')
+					div.style('left', (-config.containerOffset + left - (mywidth - (xScale.bandwidth() * widthRatio)) / 2 + 'px'))
+						.style('top', (top + 5 + boxshift - config.headerOffset) + 'px')
+					arrow.style('top', (top + arrowshift - config.headerOffset) + 'px')
 				})
 				.on('mouseout', function(d) {
 					div.transition()
