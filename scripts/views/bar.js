@@ -117,7 +117,7 @@ module.exports = BaseChart.extend({
 
     // If there are greater than 10 bars, zoom to the first bar (ideally this would be done by configuration)
     this.chart.addListener('drawn', this.zoomToBeginning)
-    this.zoomToBeginning() // since rendered isn't called the first time
+    //this.zoomToBeginning() // since rendered isn't called the first time
 
     // Listen to cursor hover changes
    // this.chart.chartCursor.addListener('changed', this.onHover)
@@ -134,9 +134,11 @@ module.exports = BaseChart.extend({
     } */
 
     // If there are more records than the default, show scroll bars
+	if (this.collection) {
     if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {
       this.$('.scroll').removeClass('hidden')
     }
+	}
   },
   zoomToBeginning: function () {
     if (this.collection.length > this.chart.maxSelectedSeries) {

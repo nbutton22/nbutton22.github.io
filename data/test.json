@@ -6,13 +6,46 @@
   },
   "cards": [
     {
-	  "x": 0,
+      "x": 0,
       "y": 0,
       "width": 6,
       "height": 8,
       "vizwit": {
+		"chartType": "sql",
+		"title": "Water Fluoridation in Alaska (SQL)",
+		"description": "Percent of population served by CWS that are receiving fluoridated water",
+		"provider": "sql",
+		"dataset": "DOH_Data_Fluoridation",
+		"groupBy": "Year",
+		"valueField": "Data_Value",
+		"order": "Year",
+		"valueUnit": "Data_Value_Unit",
+		"baseFilters": [
+			{
+				"field": "Indicator",
+				"expression": {
+					"type": "=",
+					"value": "Percent of population served by CWS that are receiving fluoridated water"
+				}
+			},
+			{
+				"field": "LocationDesc",
+				"expression": {
+					"type": "=",
+					"value": "Alaska"
+				}
+			}
+		]
+	  }
+    },
+	{
+      "x": 0,
+      "y": 30,
+      "width": 6,
+      "height": 8,
+      "vizwit": {
         "chartType": "d3bar",
-        "title": "Alcoholic Consumption in Georgia (D3JS)",
+        "title": "Alcoholic Consumption in Georgia",
         "description": "Adults asked if they have had at least one drink of alcohol within the last 30 days",
         "provider": "socrata",
         "domain": "chronicdata.cdc.gov",
@@ -57,56 +90,6 @@
     },
 	{
       "x": 6,
-      "y": 0,
-      "width": 6,
-      "height": 8,
-      "vizwit": {
-        "chartType": "bar",
-        "title": "Alcoholic Consumption in Georgia (amCharts)",
-        "description": "Adults asked if they have had at least one drink of alcohol within the last 30 days",
-        "provider": "socrata",
-        "domain": "chronicdata.cdc.gov",
-        "dataset": "fn2i-3j6c",
-        "groupBy": "response",
-        "valueField": "sum(data_value)",
-        "order": "label desc",
-		"sample_size": "sum(sample_size)",
-		"confidence_low": "sum(confidence_limit_low)",
-		"confidence_high": "sum(confidence_limit_high)",
-        "baseFilters": [
-          {
-            "field": "topic",
-            "expression": {
-              "type": "=",
-              "value": "Alcohol Consumption"
-            }
-          },
-          {
-            "field": "locationdesc",
-            "expression": {
-              "type": "=",
-              "value": "Georgia"
-            }
-          },
-          {
-            "field": "break_out",
-            "expression": {
-              "type": "=",
-              "value": "Overall"
-            }
-          },
-          {
-            "field": "year",
-            "expression": {
-              "type": "=",
-              "value": "2014"
-            }
-          }
-        ]
-      }
-    },
-	{
-      "x": 0,
       "y": 30,
       "width": 6,
       "height": 8,
@@ -154,8 +137,8 @@
       }
     },
 	{
-      "x": 6,
-      "y": 30,
+      "x": 0,
+      "y": 60,
       "width": 6,
       "height": 8,
       "vizwit": {
@@ -204,7 +187,7 @@
       }
     },
 	{
-      "x": 3,
+      "x": 6,
       "y": 60,
       "width": 6,
       "height": 8,

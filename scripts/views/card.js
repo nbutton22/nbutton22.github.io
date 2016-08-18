@@ -98,8 +98,10 @@ module.exports = Backbone.View.extend({
     e.preventDefault()
   },
   updateExportLink: function (collection) {
+	if (this.config.chartType != "sql") {
     collection = collection || this.collection
     this.$('.export-link').attr('href', collection.exportUrl())
+	}
   },
   onClickEmbedLink: function (e) {
     var exportView = new EmbedHelperView({model: new Backbone.Model(this.config)})

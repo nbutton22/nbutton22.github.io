@@ -11,10 +11,17 @@ function makeBarChart(dataProvider, container, config) {
 			right: 0
 		}
 		
-
+		if (dataProvider.sample_size == null) {
+			dataProvider.sample_size = ""
+		}
+		if (dataProvider[0].ci_low == null) {
+			dataProvider[0].ci_low = ""
+		}
+		if (dataProvider[0].ci_high == null) {
+			dataProvider[0].ci_high = ""
+		}
 		
-		
-		
+		//Get Width and Height of container
 		var style = window.getComputedStyle(container)
 		var divwidth = style.getPropertyValue('width')
 		divwidth = Number(divwidth.slice(0, divwidth.length - 2))
@@ -22,25 +29,26 @@ function makeBarChart(dataProvider, container, config) {
 		divheight = Number(divheight.slice(0, divheight.length - 2))
 		var height = divheight - margin.top - margin.bottom;
 		var width = divwidth - margin.left - margin.right;
-		
+		//get coordinates of container
 		var containerInfo = document.getElementById(config.cardId).getBoundingClientRect()
 		var containerTop = containerInfo.top
 		var containerLeft = containerInfo.left
+
 		
 		
-		
+		//scale for bar height
 		var yScale = d3.scaleLinear()
 			.domain([0, 1.1 * d3.max(dataProvider, function(data) { return data.value })])
 			.range([0, height])
-		
+		//scale for y axis
 		var yAxisScale = d3.scaleLinear()
 			.domain([0, 1.1 * d3.max(dataProvider, function(data) { return data.value })])
 			.range([height, 0])
-			
+		//scale for bar position on x axis
 		var xScale = d3.scaleBand()
 			.domain(dataProvider.map(function(d) {return d.label}))
 			.range([0, width])
-			
+		//create axes and grid
 		var xAxis = d3.axisBottom(xScale)
 			.tickSizeOuter(0)
 
@@ -90,9 +98,13 @@ function makeBarChart(dataProvider, container, config) {
 			.style('left', '0px')
 		var chart = svg.append('g')
 		chart.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+		
+		
 		chart.selectAll('rect').data(dataProvider)
 			.enter().append('rect')
-				.attr('id', function(d, i) { return 'rect' + i})
+			
+			
+				.attr('id', function(d, i) { return config.cardId + 'rect' + i})
 				.attr('width', xScale.bandwidth() * widthRatio)
 				.attr('fill', 'rgba(151, 187, 205, 0.6)')
 				.attr('opacity', 0.6)
@@ -104,7 +116,11 @@ function makeBarChart(dataProvider, container, config) {
 						})
 				.attr('y', function(d) {return height - yScale(d.value)})
 				.on('mouseover', function(d, i) {
+					if (d.ci_low != "") {
 					div.html('<b>Overall<br>' + d.value + '%</b><br>CI(' + d.ci_low + ' - ' + d.ci_high + '), n = ' + d.sample_size)
+					} else {
+						div.html('Overall<br>' + d.value + '%')
+					}
 					
 					var style = window.getComputedStyle(document.getElementById('mytooltip'))
 					var mywidth = style.getPropertyValue('width')
@@ -112,11 +128,9 @@ function makeBarChart(dataProvider, container, config) {
 					var myheight = style.getPropertyValue('height')
 					myheight = myheight.slice(0, myheight.length - 2)
 					
-					var offsets = document.getElementById('rect' + i).getBoundingClientRect();
-					var offset = document.getElementById('rect' + i)
+					var offsets = document.getElementById(config.cardId + 'rect' + i).getBoundingClientRect();
+					var offset = document.getElementById(config.cardId + 'rect' + i)
 					var offsetStyle = window.getComputedStyle(offset)
-					console.log(offsetStyle)
-					console.log('Top: ' + offsetStyle.getPropertyValue('top') + ', Left: ' + offsetStyle.getPropertyValue('left'))
 					var top = offsets.top + window.scrollY;
 					var left = offsets.left;
 					
@@ -151,6 +165,7 @@ function makeBarChart(dataProvider, container, config) {
 						.duration(100)
 						.style('opacity', 0)
 				})
+		if (dataProvider[0].ci_low != "") {
 		chart.selectAll('path').data(dataProvider)
 			.enter().append('path')
 			.attr('class', 'errbar')
@@ -166,4 +181,5 @@ function makeBarChart(dataProvider, container, config) {
 				instructions += ' h10 -20 10'
 				return instructions
 			})
+		}
 }

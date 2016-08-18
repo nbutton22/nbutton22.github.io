@@ -63662,7 +63662,7 @@ module.exports = function (config, options) {
   })
 }
 
-},{"./views/header":133,"./vizwit":138,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
+},{"./views/header":133,"./vizwit":137,"backbone":12,"jquery":29,"underscore":106}],115:[function(require,module,exports){
 module.exports = function(data){
 var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};
 __p+='';
@@ -63982,7 +63982,7 @@ module.exports = BaseChart.extend({
 
     // If there are greater than 10 bars, zoom to the first bar (ideally this would be done by configuration)
     this.chart.addListener('drawn', this.zoomToBeginning)
-    this.zoomToBeginning() // since rendered isn't called the first time
+    //this.zoomToBeginning() // since rendered isn't called the first time
 
     // Listen to cursor hover changes
    // this.chart.chartCursor.addListener('changed', this.onHover)
@@ -63999,9 +63999,11 @@ module.exports = BaseChart.extend({
     } */
 
     // If there are more records than the default, show scroll bars
+	if (this.collection) {
     if (this.chart.endIndex - this.chart.startIndex < this.collection.length) {
       this.$('.scroll').removeClass('hidden')
     }
+	}
   },
   zoomToBeginning: function () {
     if (this.collection.length > this.chart.maxSelectedSeries) {
@@ -64084,13 +64086,18 @@ module.exports = Card.extend({
 	this.noCollection = options.noCollection || null
 
     // Listen to vent filters
-    this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
+    //this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
 
     // Listen to collection
+	if (options.config.chartType != 'sql') {
     this.listenTo(this.collection, 'sync', this.render)
 	this.listenTo(this.noCollection, 'sync', this.render)
     this.listenTo(this.filteredCollection, 'sync', this.render)
-
+	} else {
+		this.render()
+	}
+	
+	
     // Loading indicators
     this.listenTo(this.collection, 'request', LoaderOn)
     this.listenTo(this.collection, 'sync', LoaderOff)
@@ -64123,7 +64130,9 @@ module.exports = Card.extend({
 			|| options.config.chartType == 'clustered') {
 		this.collection.setFilter(yesData)
 	}
+	if (this.collection) {
     this.collection.fetch()
+	}
 	
 	if (this.noCollection) {
 	this.noCollection.setFilter(noData)
@@ -64136,10 +64145,10 @@ module.exports = Card.extend({
     var config = $.extend(true, {}, this.settings.chart)
 	if (this.settings.chart.type == "map") {
 	  config.dataProvider = this.formatMapData(this.settings.limit)
-	} else {
+	} else if (this.config.chartType != "sql") {
       config.dataProvider = this.formatChartData(this.settings.limit)
 	}
-	console.log(config.dataProvider)
+
 
     // Define the series/graph for the original amount
 	if (this.settings.graphs){
@@ -64152,6 +64161,7 @@ module.exports = Card.extend({
 
 	
     // If there's a filtered amount, define the series/graph for it
+	if (this.filteredCollection) {
      if (this.filteredCollection.getFilters().length) {
       // Change color of original graph to subdued
       //config.graphs[0].lineColor = '#ddd'
@@ -64159,6 +64169,7 @@ module.exports = Card.extend({
 
       config.graphs.push($.extend(true, {}, this.settings.graphs[1]))
     } 
+	}
 
     if (this.settings.categoryAxis) { this.updateGuide(config) }
 
@@ -64175,11 +64186,15 @@ module.exports = Card.extend({
 		cardId: this.$('.card').parent().attr('id')
 	}
 	
-	console.log(this.$('.card').parent())
+	//console.log(this.$('.card').parent())
 	
 	
 	if (this.config.chartType == "d3bar") {
 		makeBarChart(config.dataProvider, mycontainer, myConfig)
+	} else if (this.config.chartType == "sql") {
+		var result = sqlFetch(this.config)
+
+		makeBarChart(result, mycontainer, myConfig)
 	} else {
 		this.chart.write(this.$('.card-content').get(0))
 	}
@@ -64506,8 +64521,10 @@ module.exports = Backbone.View.extend({
     e.preventDefault()
   },
   updateExportLink: function (collection) {
+	if (this.config.chartType != "sql") {
     collection = collection || this.collection
     this.$('.export-link').attr('href', collection.exportUrl())
+	}
   },
   onClickEmbedLink: function (e) {
     var exportView = new EmbedHelperView({model: new Backbone.Model(this.config)})
@@ -65747,53 +65764,6 @@ module.exports = Card.extend({
 })
 
 },{"../util/loader":121,"./card":126,"bootstrap/js/tooltip":16,"datatables":28,"datatables/media/js/dataTables.bootstrap":27,"underscore":106}],137:[function(require,module,exports){
-var $ = require('jquery')
-var deparam = require('node-jquery-deparam')
-var Gist = require('./collections/gist')
-var layout = require('./layout')
-
-var params = window.location.search.substr(1) ? deparam(window.location.search.substr(1)) : {}
-var pathToFiles = 'data/' // should include trailing slash
-
-var layoutOptions = {
-  headerSelector: '#page-header',
-  contentSelector: '#page-content'
-}
-
-// If gist ID specified, fetch it using github's API
-if (params.gist) {
-  (new Gist(null, {id: params.gist})).fetch({
-    success: function (collection, response, options) {
-      if (!collection.length) return console.error('No files in gist', params.gist)
-
-      // If a file was provided, use that one; otherwise use the first file in the gist
-      var model = params.file && collection.get(params.file) ? collection.get(params.file) : collection.at(0)
-      var config = JSON.parse(model.get('content'))
-
-      layout(config, layoutOptions)
-    },
-    error: function () {
-      console.error('Error fetching gist', params.gist)
-    }
-  })
-// If file specified, load it from the files directory
-} else if (params.file) {
-  $.getJSON(pathToFiles + params.file, function (data) {
-    layout(data, layoutOptions)
-  }).fail(function () {
-    console.error('Error loading file', params.file)
-  })
-// If no config specified, redirect to homepage
-} else {
-  $.getJSON(pathToFiles + 'test.json', function (data) {
-    layout(data, layoutOptions)
-  }).fail(function () {
-    console.error('Error loading file', 'test.json')
-  })
-  //window.location.replace('http://vizwit.io')
-}
-
-},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}],138:[function(require,module,exports){
 /*eslint no-new:0*/
 var _ = require('underscore')
 var Backbone = require('backbone')
@@ -65818,11 +65788,14 @@ exports.init = function (container, config, opts) {
   opts.fieldsCache = opts.fieldsCache || {}
 
   // Get provider
+  if (config.provider == "socrata") {
   if (!config.provider) config.provider = 'socrata' // set default for backwards compatibility
   var Provider = Providers[config.provider.toLowerCase()]
   if (!Provider) console.error('Unrecognized provider %s', config.provider)
+  }
 
   // Initialize collection
+  if (config.provider == "socrata") {
   var collection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
@@ -65836,9 +65809,17 @@ exports.init = function (container, config, opts) {
     config: config,
     fieldsCache: opts.fieldsCache
   })
+  }
 
   // Initialize view
+
   switch (config.chartType) {
+	case 'sql':
+	  new Bar({
+		  config: config,
+		  el: container,
+		  vent: opts.vent
+	  })
     case 'bar':
       new Bar({
         config: config,
@@ -65927,4 +65908,51 @@ exports.init = function (container, config, opts) {
   }
 }
 
-},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/clustered":128,"./views/d3bar":130,"./views/datetime":131,"./views/map":134,"./views/pie":135,"./views/table":136,"backbone":12,"underscore":106}]},{},[137]);
+},{"./collections/geojson":109,"./config/providers":113,"./views/bar":123,"./views/callout":125,"./views/choropleth":127,"./views/clustered":128,"./views/d3bar":130,"./views/datetime":131,"./views/map":134,"./views/pie":135,"./views/table":136,"backbone":12,"underscore":106}],138:[function(require,module,exports){
+var $ = require('jquery')
+var deparam = require('node-jquery-deparam')
+var Gist = require('./collections/gist')
+var layout = require('./layout')
+
+var params = window.location.search.substr(1) ? deparam(window.location.search.substr(1)) : {}
+var pathToFiles = 'data/' // should include trailing slash
+
+var layoutOptions = {
+  headerSelector: '#page-header',
+  contentSelector: '#page-content'
+}
+
+// If gist ID specified, fetch it using github's API
+if (params.gist) {
+  (new Gist(null, {id: params.gist})).fetch({
+    success: function (collection, response, options) {
+      if (!collection.length) return console.error('No files in gist', params.gist)
+
+      // If a file was provided, use that one; otherwise use the first file in the gist
+      var model = params.file && collection.get(params.file) ? collection.get(params.file) : collection.at(0)
+      var config = JSON.parse(model.get('content'))
+
+      layout(config, layoutOptions)
+    },
+    error: function () {
+      console.error('Error fetching gist', params.gist)
+    }
+  })
+// If file specified, load it from the files directory
+} else if (params.file) {
+  $.getJSON(pathToFiles + params.file, function (data) {
+    layout(data, layoutOptions)
+  }).fail(function () {
+    console.error('Error loading file', params.file)
+  })
+// If no config specified, redirect to homepage
+} else {
+  $.getJSON(pathToFiles + 'test.json', function (data) {
+    layout(data, layoutOptions)
+  }).fail(function () {
+    console.error('Error loading file', 'test.json')
+  })
+  //window.location.replace('http://vizwit.io')
+}
+
+},{"./collections/gist":110,"./layout":114,"jquery":29,"node-jquery-deparam":61}]},{},[138]);

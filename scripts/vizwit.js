@@ -22,11 +22,14 @@ exports.init = function (container, config, opts) {
   opts.fieldsCache = opts.fieldsCache || {}
 
   // Get provider
+  if (config.provider == "socrata") {
   if (!config.provider) config.provider = 'socrata' // set default for backwards compatibility
   var Provider = Providers[config.provider.toLowerCase()]
   if (!Provider) console.error('Unrecognized provider %s', config.provider)
+  }
 
   // Initialize collection
+  if (config.provider == "socrata") {
   var collection = new Provider(null, {
     config: config,
     fieldsCache: opts.fieldsCache
@@ -40,9 +43,17 @@ exports.init = function (container, config, opts) {
     config: config,
     fieldsCache: opts.fieldsCache
   })
+  }
 
   // Initialize view
+
   switch (config.chartType) {
+	case 'sql':
+	  new Bar({
+		  config: config,
+		  el: container,
+		  vent: opts.vent
+	  })
     case 'bar':
       new Bar({
         config: config,

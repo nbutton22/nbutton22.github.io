@@ -21,13 +21,18 @@ module.exports = Card.extend({
 	this.noCollection = options.noCollection || null
 
     // Listen to vent filters
-    this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
+    //this.listenTo(this.vent, this.collection.getDataset() + '.filter', this.onFilter)
 
     // Listen to collection
+	if (options.config.chartType != 'sql') {
     this.listenTo(this.collection, 'sync', this.render)
 	this.listenTo(this.noCollection, 'sync', this.render)
     this.listenTo(this.filteredCollection, 'sync', this.render)
-
+	} else {
+		this.render()
+	}
+	
+	
     // Loading indicators
     this.listenTo(this.collection, 'request', LoaderOn)
     this.listenTo(this.collection, 'sync', LoaderOff)
@@ -60,7 +65,9 @@ module.exports = Card.extend({
 			|| options.config.chartType == 'clustered') {
 		this.collection.setFilter(yesData)
 	}
+	if (this.collection) {
     this.collection.fetch()
+	}
 	
 	if (this.noCollection) {
 	this.noCollection.setFilter(noData)
@@ -73,10 +80,10 @@ module.exports = Card.extend({
     var config = $.extend(true, {}, this.settings.chart)
 	if (this.settings.chart.type == "map") {
 	  config.dataProvider = this.formatMapData(this.settings.limit)
-	} else {
+	} else if (this.config.chartType != "sql") {
       config.dataProvider = this.formatChartData(this.settings.limit)
 	}
-	console.log(config.dataProvider)
+
 
     // Define the series/graph for the original amount
 	if (this.settings.graphs){
@@ -89,6 +96,7 @@ module.exports = Card.extend({
 
 	
     // If there's a filtered amount, define the series/graph for it
+	if (this.filteredCollection) {
      if (this.filteredCollection.getFilters().length) {
       // Change color of original graph to subdued
       //config.graphs[0].lineColor = '#ddd'
@@ -96,6 +104,7 @@ module.exports = Card.extend({
 
       config.graphs.push($.extend(true, {}, this.settings.graphs[1]))
     } 
+	}
 
     if (this.settings.categoryAxis) { this.updateGuide(config) }
 
@@ -112,11 +121,15 @@ module.exports = Card.extend({
 		cardId: this.$('.card').parent().attr('id')
 	}
 	
-	console.log(this.$('.card').parent())
+	//console.log(this.$('.card').parent())
 	
 	
 	if (this.config.chartType == "d3bar") {
 		makeBarChart(config.dataProvider, mycontainer, myConfig)
+	} else if (this.config.chartType == "sql") {
+		var result = sqlFetch(this.config)
+
+		makeBarChart(result, mycontainer, myConfig)
 	} else {
 		this.chart.write(this.$('.card-content').get(0))
 	}
