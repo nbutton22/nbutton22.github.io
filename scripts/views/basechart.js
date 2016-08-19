@@ -118,18 +118,20 @@ module.exports = Card.extend({
 	
 	
 	var myConfig = {
-		cardId: this.$('.card').parent().attr('id')
+		cardId: this.$('.card').parent().attr('id'),
+		yAxisLabel: "Percent (%)"
 	}
 	
 	//console.log(this.$('.card').parent())
-	
+	function makeChart(result) {
+		makeBarChart(result, mycontainer, myConfig)
+	}
 	
 	if (this.config.chartType == "d3bar") {
 		makeBarChart(config.dataProvider, mycontainer, myConfig)
 	} else if (this.config.chartType == "sql") {
-		var result = sqlFetch(this.config)
-
-		makeBarChart(result, mycontainer, myConfig)
+		
+		request(this.config, makeChart)
 	} else {
 		this.chart.write(this.$('.card-content').get(0))
 	}
